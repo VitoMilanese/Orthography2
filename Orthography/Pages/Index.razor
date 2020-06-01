@@ -3,48 +3,67 @@
 
 <div class="row">
     <div class="form-group col-sm mr-2">
-        <label for="mode">Mode: </label>
-        <select id="mode" class="form-control col-12">
-            @foreach (var mode in Modes)
+        @if (Modes.Count > 0)
+        {
+            <label for="mode">Mode: </label>
+            <select id="mode" class="form-control col-12" disabled="@randomMode" @bind="@selectedMode">
+                @foreach (var mode in Modes)
+                {
+                    <option value="@mode.ID">
+                        @mode.Value
+                    </option>
+                }
+            </select>
+            @if (Modes.Count > 1)
             {
-                <option value="@mode.ID">
-                    @mode.Value
-                </option>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="cbRandomMode" @bind="@randomMode" />
+                    <label for="cbRandomMode" class="custom-control-label">Random</label>
+                </div>
             }
-        </select>
+        }
     </div>
     <div class="form-group col-sm mr-2">
-        <label for="number">Number: </label>
-        <select id="number" class="form-control">
-            @foreach (var number in Numbers)
-            {
-                <option value="@number.ID">
-                    @number.Value
-                </option>
-            }
-        </select>
+        @if (Numbers.Count > 0)
+        {
+            <label for="number">Number: </label>
+            <select id="number" class="form-control" @bind="@selectedNumber">
+                @foreach (var number in Numbers)
+                {
+                    <option value="@number.ID">
+                        @number.Value
+                    </option>
+                }
+            </select>
+        }
     </div>
     <div class="form-group col-sm mr-2">
-        <label for="person">Person: </label>
-        <select id="person" class="form-control">
-            @foreach (var person in Persons)
-            {
-                <option value="@person.ID">
-                    @person.Value
-                </option>
-            }
-        </select>
+        @if (Persons.Count > 0)
+        {
+            <label for="person">Person: </label>
+            <select id="person" class="form-control" @bind="@selectedPerson">
+                @foreach (var person in Persons)
+                {
+                    <option value="@person.ID">
+                        @person.Value
+                    </option>
+                }
+            </select>
+        }
     </div>
     <div class="form-group col-sm">
-        <label for="gender">Gender: </label>
-        <select id="gender" class="form-control">
-            @foreach (var gender in Genders)
-            {
-                <option value="@gender.ID">
-                    @gender.Value
-                </option>
-            }
-        </select>
+        @if (Genders.Count > 0)
+        {
+            <label for="gender">Gender: </label>
+            <select id="gender" class="form-control" @bind="@selectedGender">
+                @foreach (var gender in Genders)
+                {
+                    <option value="@gender.ID">
+                        @gender.Value
+                    </option>
+                }
+            </select>
+        }
     </div>
 </div>
 
@@ -132,108 +151,149 @@ else
 }
 
 @code {
+    private const string ConnectionString = @"Data Source=192.168.1.3\SQLSERVER;Initial Catalog=Orthography;Persist Security Info=True;User ID=sa;Password=developer";
+    private DataContext dataContext;
     private List<Word> Words;
-    private List<IdValue> Modes;
-    private List<IdValue> Numbers;
-    private List<IdValue> Persons;
-    private List<IdValue> Genders;
+    private List<Mode> Modes;
+    private List<Number> Numbers;
+    private List<Person> Persons;
+    private List<Gender> Genders;
     private Word word;
+    private List<Rule> rules;
+    private List<Relation> relations;
     private string inputText;
     private bool showTranslation;
+    private bool randomMode;
     private bool lockWord;
     private bool showResult;
     private bool resultValue;
     private bool isGenerating;
+    private int selectedNumber;
+    private int selectedPerson;
+    private int selectedGender;
+    private int m_selectedMode;
+    private int selectedMode
+    {
+        get => m_selectedMode;
+        set
+        {
+            m_selectedMode = value;
+
+            var rr = rules.Where(p => p.ModeID == selectedMode);
+
+            var numbers = rr.Select(p => p.NumberID).Distinct().ToList();
+            var persons = rr.Select(p => p.PersonID).Distinct().ToList();
+            var genders = rr.Select(p => p.GenderID).Distinct().ToList();
+
+            Numbers = dataContext.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
+            Persons = dataContext.Persons.Where(p => persons.Contains(p.ID)).ToList();
+            Genders = dataContext.Genders.Where(p => genders.Contains(p.ID)).ToList();
+
+            selectedPerson = Persons[0].ID;
+            selectedNumber = Numbers[0].ID;
+            selectedGender = Genders[0].ID;
+        }
+    }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        Words = new List<Word> {
-            new Word {
-                ID = 1,
-                PrepositionsMask = 0,
-                Value = "avoir",
-                Translation = "иметь"
-            },
-            new Word {
-                ID = 2,
-                PrepositionsMask = 0,
-                Value = "faire",
-                Translation = "делать"
-            },
-            new Word {
-                ID = 3,
-                PrepositionsMask = 0,
-                Value = "aller",
-                Translation = "идти"
-            }
-        };
-        word = Words[0];
+        dataContext = new DataContext(ConnectionString);
 
-        Modes = new List<IdValue> {
-            new IdValue(0, "Random"),
-            new IdValue(1, "Present"),
-            new IdValue(2, "Imperfect"),
-            new IdValue(3, "Future"),
-            new IdValue(4, "Imperative"),
-            new IdValue(5, "Participle")
-    };
+        Modes = new List<Mode>();
+        Persons = new List<Person>();
+        Numbers = new List<Number>();
+        Genders = new List<Gender>();
 
-        Numbers = new List<IdValue> {
-            new IdValue(0, "Any"),
-            new IdValue(1, "Singular"),
-            new IdValue(2, "Plural")
-        };
+        var wordIds = dataContext.Relations.Select(p => p.WordID).Distinct().ToList();
+        Words = dataContext.Words.Where(p => wordIds.Contains(p.ID)).ToList();
 
-        Persons = new List<IdValue> {
-            new IdValue(0, "Any"),
-            new IdValue(1, "First"),
-            new IdValue(2, "Second"),
-            new IdValue(3, "Third")
-        };
-
-        Genders = new List<IdValue> {
-            new IdValue(0, "Any"),
-            new IdValue(1, "Male"),
-            new IdValue(2, "Female")
-        };
+        GetWord();
     }
 
-    private void AnswerKeyPress(KeyboardEventArgs e)
+    private async Task AnswerKeyPress(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
-            CheckAnswer();
+            await CheckAnswer();
     }
 
-    private void CheckAnswer()
+    private async Task CheckAnswer()
     {
         if (showResult) return;
-        resultValue = (inputText?.ToLower() ?? string.Empty) == (word?.Translation?.ToLower() ?? string.Empty);
+        var selectedRule = rules.Where(p =>
+            p.ModeID == selectedMode &&
+            p.NumberID == selectedNumber &&
+            p.PersonID == selectedPerson &&
+            p.GenderID == selectedGender)
+            .Select(p => p.ID)
+            .FirstOrDefault();
+        var answer = relations.FirstOrDefault(p => p.RuleID == selectedRule).Result;
+        resultValue = (inputText?.Trim().ToLower() ?? string.Empty) == (answer?.Trim().ToLower() ?? string.Empty);
         showResult = true;
-        Task.Run(async () =>
+        await Task.Run(async () =>
         {
             await Task.Delay(1000);
             showResult = false;
             if (resultValue && !lockWord)
-                GenerateWord();
-            this.StateHasChanged();
+                await GenerateWord();
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
         });
     }
 
-    private void GenerateWord()
+    private async Task GenerateWord()
     {
         if (isGenerating) return;
         isGenerating = true;
-        Task.Run(async () =>
+        await Task.Run(async () =>
         {
-            await Task.Delay(1000);
-            var words = Words.Where(p => p.ID != word.ID).ToList();
-            var id = new Random(DateTime.Now.Millisecond).Next(words.Count);
-            word = words[id];
-
+            await Task.Delay(100);
+            GetWord();
             isGenerating = false;
-            this.StateHasChanged();
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
         });
+    }
+
+    private void GetWord()
+    {
+        if (Words.Count <= 0)
+        {
+            // no words
+            return;
+        }
+        var rnd = new Random(DateTime.Now.Millisecond);
+        if (Words.Count == 1)
+        {
+            word = Words[0];
+        }
+        else
+        {
+            var id = rnd.Next(Words.Count - (word == null ? 0 : 1));
+            word = Words.Where(p => word == null || p.ID != word.ID).ToList()[id];
+        }
+
+        inputText = string.Empty;
+
+        relations = dataContext.Relations.Where(p => p.WordID == word.ID).ToList();
+        var ruleIds = relations.Select(p => p.RuleID);
+        rules = dataContext.Rules.Where(p => ruleIds.Contains(p.ID)).ToList();
+
+        var modes = rules.Select(p => p.ModeID).Distinct().ToList();
+        Modes = dataContext.Modes.Where(p => modes.Contains(p.ID)).ToList();
+        if (!randomMode)
+            selectedMode = Modes[0].ID;
+        else
+        {
+            var id = rnd.Next(Modes.Count);
+            selectedMode = Modes[id].ID;
+        }
+
+        var numbers = rules.Select(p => p.NumberID).Distinct().ToList();
+        var persons = rules.Select(p => p.PersonID).Distinct().ToList();
+        var genders = rules.Select(p => p.GenderID).Distinct().ToList();
+
+        Numbers = dataContext.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
+        Persons = dataContext.Persons.Where(p => persons.Contains(p.ID)).ToList();
+        Genders = dataContext.Genders.Where(p => genders.Contains(p.ID)).ToList();
     }
 }
