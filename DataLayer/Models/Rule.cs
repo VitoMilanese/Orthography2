@@ -1,5 +1,8 @@
-﻿namespace DataLayer.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DataLayer.Models
 {
+	[Table("Rule", Schema = "dict")]
 	public class Rule
 	{
 		public int ID { get; set; }

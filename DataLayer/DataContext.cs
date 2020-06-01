@@ -1,5 +1,4 @@
 ﻿using DataLayer.Models;
-using DataLayer.Models.enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer

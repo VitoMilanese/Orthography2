@@ -8,38 +8,14 @@
   <Shapes>
     <Shape ID="DesignTable:Word" ZOrder="13" X="197" Y="23" Height="181" Width="206" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="122" />
     <Shape ID="DesignTable:Rule" ZOrder="12" X="808" Y="17" Height="204" Width="197" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="145" />
-    <Shape ID="DesignTable:Relation" ZOrder="11" X="505" Y="21" Height="158" Width="225" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="99" />
-    <Shape ID="DesignTable:Gender" ZOrder="2" X="865" Y="306" Height="135" Width="218" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
-    <Shape ID="DesignTable:Person" ZOrder="5" X="1139" Y="17" Height="135" Width="215" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
-    <Shape ID="DesignTable:Mode" ZOrder="3" X="564" Y="311" Height="135" Width="207" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
-    <Shape ID="DesignTable:Number" ZOrder="4" X="1140" Y="190" Height="135" Width="225" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
+    <Shape ID="DesignTable:Gender" ZOrder="5" X="865" Y="306" Height="135" Width="218" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
+    <Shape ID="DesignTable:Person" ZOrder="8" X="1139" Y="17" Height="135" Width="215" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
+    <Shape ID="DesignTable:Mode" ZOrder="6" X="564" Y="311" Height="135" Width="207" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
+    <Shape ID="DesignTable:Number" ZOrder="7" X="1140" Y="190" Height="135" Width="225" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="76" />
+    <Shape ID="DesignTable:Relation" ZOrder="3" X="483" Y="20" Height="181" Width="225" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="122" />
   </Shapes>
   <Connectors>
-    <Connector ID="DesignRelation:FK_Relation_Rule" ZOrder="10" LineWidth="11">
-      <RoutePoints>
-        <Point>
-          <X>808</X>
-          <Y>66</Y>
-        </Point>
-        <Point>
-          <X>730</X>
-          <Y>66</Y>
-        </Point>
-      </RoutePoints>
-    </Connector>
-    <Connector ID="DesignRelation:FK_Relation_Word" ZOrder="9" LineWidth="11">
-      <RoutePoints>
-        <Point>
-          <X>403</X>
-          <Y>58</Y>
-        </Point>
-        <Point>
-          <X>505</X>
-          <Y>58</Y>
-        </Point>
-      </RoutePoints>
-    </Connector>
-    <Connector ID="DesignRelation:FK_Rule_Gender" ZOrder="1" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Rule_Gender" ZOrder="4" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>948</X>
@@ -51,7 +27,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Rule_Mode" ZOrder="8" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Rule_Mode" ZOrder="11" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>754</X>
@@ -67,7 +43,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Rule_Number" ZOrder="7" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Rule_Number" ZOrder="10" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>1140</X>
@@ -79,7 +55,7 @@
         </Point>
       </RoutePoints>
     </Connector>
-    <Connector ID="DesignRelation:FK_Rule_Person" ZOrder="6" LineWidth="11">
+    <Connector ID="DesignRelation:FK_Rule_Person" ZOrder="9" LineWidth="11">
       <RoutePoints>
         <Point>
           <X>1139</X>
@@ -88,6 +64,30 @@
         <Point>
           <X>1005</X>
           <Y>84</Y>
+        </Point>
+      </RoutePoints>
+    </Connector>
+    <Connector ID="DesignRelation:FK_Relation_Rule" ZOrder="2" LineWidth="11">
+      <RoutePoints>
+        <Point>
+          <X>808</X>
+          <Y>65</Y>
+        </Point>
+        <Point>
+          <X>708</X>
+          <Y>65</Y>
+        </Point>
+      </RoutePoints>
+    </Connector>
+    <Connector ID="DesignRelation:FK_Relation_Word" ZOrder="1" LineWidth="11">
+      <RoutePoints>
+        <Point>
+          <X>403</X>
+          <Y>57</Y>
+        </Point>
+        <Point>
+          <X>483</X>
+          <Y>57</Y>
         </Point>
       </RoutePoints>
     </Connector>
