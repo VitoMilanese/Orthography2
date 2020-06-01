@@ -140,7 +140,7 @@ else
         }
 
         resultValue = true;
-        var bits = BitmaskToArray(word.PrepositionsMask);
+        var bits = BitmaskToArray((int)word.PrepositionsMask);
         for (var i = 0; i < cbStates.Length; ++i)
         {
             var f = cbStates[i] == bits[i];
