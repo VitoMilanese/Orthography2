@@ -1,0 +1,239 @@
+﻿@*https://getbootstrap.com/docs/4.1/layout/grid/*@
+@page "/"
+
+<div class="row">
+    <div class="form-group col-sm mr-2">
+        <label for="mode">Mode: </label>
+        <select id="mode" class="form-control col-12">
+            @foreach (var mode in Modes)
+            {
+                <option value="@mode.ID">
+                    @mode.Value
+                </option>
+            }
+        </select>
+    </div>
+    <div class="form-group col-sm mr-2">
+        <label for="number">Number: </label>
+        <select id="number" class="form-control">
+            @foreach (var number in Numbers)
+            {
+                <option value="@number.ID">
+                    @number.Value
+                </option>
+            }
+        </select>
+    </div>
+    <div class="form-group col-sm mr-2">
+        <label for="person">Person: </label>
+        <select id="person" class="form-control">
+            @foreach (var person in Persons)
+            {
+                <option value="@person.ID">
+                    @person.Value
+                </option>
+            }
+        </select>
+    </div>
+    <div class="form-group col-sm">
+        <label for="gender">Gender: </label>
+        <select id="gender" class="form-control">
+            @foreach (var gender in Genders)
+            {
+                <option value="@gender.ID">
+                    @gender.Value
+                </option>
+            }
+        </select>
+    </div>
+</div>
+
+@if (word == null)
+{
+    <div class="m-3">
+        <img src="https://i.pinimg.com/originals/9f/67/65/9f6765833cee3bfe837c1dcda9370b42.jpg" />
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-sm" />
+            <div class="col-sm" style="text-align:center">
+                <h1><b>@word.Value</b></h1>
+                <a type="button" class="btn btn-outline-warning mr-1" @onclick="() => showTranslation = !showTranslation">
+                    Translation:
+                    <b>
+                        @if (showTranslation)
+                        {
+                            @word.Translation
+                        }
+                        else
+                        {
+                            @("XXXXXXXXXX")
+                        }
+                    </b>
+                </a>
+            </div>
+            <div class="col-sm" />
+        </div>
+    </div>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-3" style="text-align:right">
+                @if (isGenerating)
+                {
+                    <img src="https://art.pixilart.com/8afb782c4601281.gif" width="75" height="75" />
+                }
+                else
+                {
+                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt" @onclick="GenerateWord">Reset</button>
+                }
+            </div>
+            <div class="col-6" style="text-align:center">
+                <div class="form-group mb-0">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="cbLockWord" @bind="lockWord" />
+                        <label for="cbLockWord" class="custom-control-label">Lock the word</label>
+                    </div>
+                </div>
+                <div class="form-group col-12 mr-2 mt-0">
+                    <input type="text" class="col-12" id="answer" placeholder="Answer"
+                           style="text-align:center;min-height:30pt"
+                           @bind-value="@inputText" @bind-value:event="oninput"
+                           @onkeypress="AnswerKeyPress" />
+                </div>
+                @if (showResult)
+                {
+                    <div class="form-group mt-2">
+                        @if (resultValue)
+                        {
+                            <h3 style="color:green">Correct</h3>
+                        }
+                        else
+                        {
+                            <h3 style="color:red">Wrong</h3>
+                        }
+                    </div>
+                }
+            </div>
+            <div class="col-3" style="text-align:left">
+                @if (showResult || isGenerating)
+                {
+                    <img src="https://art.pixilart.com/8afb782c4601281.gif" width="75" height="75" />
+                }
+                else
+                {
+                    <button type="button" class="btn btn-info mt-4" style="min-height: 30pt" @onclick="CheckAnswer">Check</button>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Word> Words;
+    private List<IdValue> Modes;
+    private List<IdValue> Numbers;
+    private List<IdValue> Persons;
+    private List<IdValue> Genders;
+    private Word word;
+    private string inputText;
+    private bool showTranslation;
+    private bool lockWord;
+    private bool showResult;
+    private bool resultValue;
+    private bool isGenerating;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Words = new List<Word> {
+            new Word {
+                ID = 1,
+                PrepositionsMask = 0,
+                Value = "avoir",
+                Translation = "иметь"
+            },
+            new Word {
+                ID = 2,
+                PrepositionsMask = 0,
+                Value = "faire",
+                Translation = "делать"
+            },
+            new Word {
+                ID = 3,
+                PrepositionsMask = 0,
+                Value = "aller",
+                Translation = "идти"
+            }
+        };
+        word = Words[0];
+
+        Modes = new List<IdValue> {
+            new IdValue(0, "Random"),
+            new IdValue(1, "Present"),
+            new IdValue(2, "Imperfect"),
+            new IdValue(3, "Future"),
+            new IdValue(4, "Imperative"),
+            new IdValue(5, "Participle")
+    };
+
+        Numbers = new List<IdValue> {
+            new IdValue(0, "Any"),
+            new IdValue(1, "Singular"),
+            new IdValue(2, "Plural")
+        };
+
+        Persons = new List<IdValue> {
+            new IdValue(0, "Any"),
+            new IdValue(1, "First"),
+            new IdValue(2, "Second"),
+            new IdValue(3, "Third")
+        };
+
+        Genders = new List<IdValue> {
+            new IdValue(0, "Any"),
+            new IdValue(1, "Male"),
+            new IdValue(2, "Female")
+        };
+    }
+
+    private void AnswerKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            CheckAnswer();
+    }
+
+    private void CheckAnswer()
+    {
+        if (showResult) return;
+        resultValue = (inputText?.ToLower() ?? string.Empty) == (word?.Translation?.ToLower() ?? string.Empty);
+        showResult = true;
+        Task.Run(async () =>
+        {
+            await Task.Delay(1000);
+            showResult = false;
+            if (resultValue && !lockWord)
+                GenerateWord();
+            this.StateHasChanged();
+        });
+    }
+
+    private void GenerateWord()
+    {
+        if (isGenerating) return;
+        isGenerating = true;
+        Task.Run(async () =>
+        {
+            await Task.Delay(1000);
+            var words = Words.Where(p => p.ID != word.ID).ToList();
+            var id = new Random(DateTime.Now.Millisecond).Next(words.Count);
+            word = words[id];
+
+            isGenerating = false;
+            this.StateHasChanged();
+        });
+    }
+}
