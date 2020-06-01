@@ -27,5 +27,15 @@ namespace DataLayerTest
 			var persons = context.Persons.ToList();
 			Assert.True(persons.Count > -1, persons.Count.ToString());
 		}
+
+		[Fact]
+		public void TestWords()
+		{
+			var context = new DataContext(ConnectionString);
+			var relations = context.Relations.ToList();
+			var wordsIds = context.Relations.Select(p => p.WordID).Distinct().ToList();
+			var words = context.Words.Where(p => wordsIds.Contains(p.ID)).ToList();
+			Assert.NotNull(words);
+		}
 	}
 }
