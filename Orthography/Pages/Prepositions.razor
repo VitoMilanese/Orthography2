@@ -1,87 +1,96 @@
 ﻿@*https://mdbootstrap.com/docs/jquery/forms/checkbox/*@
 @page "/prepositions"
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-sm" />
-        <div class="col-sm" style="text-align:center">
-            <h1><b>@word.Value</b></h1>
-        </div>
-        <div class="col-sm" />
-    </div>
-</div>
-<table align="center">
-    <tr>
-        <td>
-            <div class="custom-control custom-checkbox m-2" style="color:@colors[0]">
-                <input type="checkbox" class="custom-control-input" id="cb0" @bind="@cbStates[0]">
-                <label for="cb0" class="custom-control-label">qqch</label>
-            </div>
-            <div class="custom-control custom-checkbox m-2" style="color:@colors[1]">
-                <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[1]">
-                <label for="cb1" class="custom-control-label">de qqch</label>
-            </div>
-            <div class="custom-control custom-checkbox m-2" style="color:@colors[2]">
-                <input type="checkbox" class="custom-control-input" id="cb2" @bind="@cbStates[2]">
-                <label for="cb2" class="custom-control-label">à qqch</label>
-            </div>
-        </td>
-        <td width="15px" />
-        <td>
-            <div class="custom-control custom-checkbox m-2" style="color:@colors[3]">
-                <input type="checkbox" class="custom-control-input" id="cb3" @bind="@cbStates[3]">
-                <label for="cb3" class="custom-control-label">qqn</label>
-            </div>
-            <div class="custom-control custom-checkbox m-2" style="color:@colors[4]">
-                <input type="checkbox" class="custom-control-input" id="cb4" @bind="@cbStates[4]">
-                <label for="cb4" class="custom-control-label">de qqn</label>
-            </div>
-            <div class="custom-control custom-checkbox m-2" style="color:@colors[5]">
-                <input type="checkbox" class="custom-control-input" id="cb5" @bind="@cbStates[5]">
-                <label for="cb5" class="custom-control-label">à qqn</label>
-            </div>
-        </td>
-        <td width="15px" />
-        <td>
-            <div class="col-sm">
-                <div class="custom-control custom-checkbox m-2" style="color:@colors[6]">
-                    <input type="checkbox" class="custom-control-input" id="cb6" @bind="@cbStates[6]">
-                    <label for="cb6" class="custom-control-label">faire</label>
-                </div>
-                <div class="custom-control custom-checkbox m-2" style="color:@colors[7]">
-                    <input type="checkbox" class="custom-control-input" id="cb7" @bind="@cbStates[7]">
-                    <label for="cb7" class="custom-control-label">de faire</label>
-                </div>
-                <div class="custom-control custom-checkbox m-2" style="color:@colors[8]">
-                    <input type="checkbox" class="custom-control-input" id="cb8" @bind="@cbStates[8]">
-                    <label for="cb8" class="custom-control-label">à faire</label>
-                </div>
-            </div>
-        </td>
-    </tr>
-</table>
-@if (showResult)
+@if (word == null)
 {
-    <div class="form-group" style="text-align:center">
-        <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">Next</button>
-        @if (resultValue)
-        {
-            <h3 class="mt-2" style="color:green">Correct</h3>
-        }
-        else
-        {
-            <h3 class="mt-2" style="color:red">Check your errors</h3>
-        }
-    </div>
+    <NoWordsFound />
 }
 else
 {
-    <div style="text-align:center">
-        <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">Check</button>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-sm" />
+            <div class="col-sm" style="text-align:center">
+                <h1><b>@word.Value</b></h1>
+            </div>
+            <div class="col-sm" />
+        </div>
     </div>
+    <table align="center">
+        <tr>
+            <td>
+                <div class="custom-control custom-checkbox m-2" style="color:@colors[0]">
+                    <input type="checkbox" class="custom-control-input" id="cb0" @bind="@cbStates[0]">
+                    <label for="cb0" class="custom-control-label">qqch</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2" style="color:@colors[1]">
+                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[1]">
+                    <label for="cb1" class="custom-control-label">de qqch</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2" style="color:@colors[2]">
+                    <input type="checkbox" class="custom-control-input" id="cb2" @bind="@cbStates[2]">
+                    <label for="cb2" class="custom-control-label">à qqch</label>
+                </div>
+            </td>
+            <td width="15px" />
+            <td>
+                <div class="custom-control custom-checkbox m-2" style="color:@colors[3]">
+                    <input type="checkbox" class="custom-control-input" id="cb3" @bind="@cbStates[3]">
+                    <label for="cb3" class="custom-control-label">qqn</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2" style="color:@colors[4]">
+                    <input type="checkbox" class="custom-control-input" id="cb4" @bind="@cbStates[4]">
+                    <label for="cb4" class="custom-control-label">de qqn</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2" style="color:@colors[5]">
+                    <input type="checkbox" class="custom-control-input" id="cb5" @bind="@cbStates[5]">
+                    <label for="cb5" class="custom-control-label">à qqn</label>
+                </div>
+            </td>
+            <td width="15px" />
+            <td>
+                <div class="col-sm">
+                    <div class="custom-control custom-checkbox m-2" style="color:@colors[6]">
+                        <input type="checkbox" class="custom-control-input" id="cb6" @bind="@cbStates[6]">
+                        <label for="cb6" class="custom-control-label">faire</label>
+                    </div>
+                    <div class="custom-control custom-checkbox m-2" style="color:@colors[7]">
+                        <input type="checkbox" class="custom-control-input" id="cb7" @bind="@cbStates[7]">
+                        <label for="cb7" class="custom-control-label">de faire</label>
+                    </div>
+                    <div class="custom-control custom-checkbox m-2" style="color:@colors[8]">
+                        <input type="checkbox" class="custom-control-input" id="cb8" @bind="@cbStates[8]">
+                        <label for="cb8" class="custom-control-label">à faire</label>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    @if (showResult)
+    {
+        <div class="form-group" style="text-align:center">
+            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">Next</button>
+            @if (resultValue)
+            {
+                <h3 class="mt-2" style="color:green">Correct</h3>
+            }
+            else
+            {
+                <h3 class="mt-2" style="color:red">Check your errors</h3>
+            }
+        </div>
+    }
+    else
+    {
+        <div style="text-align:center">
+            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">Check</button>
+        </div>
+    }
 }
 
 @code {
+    private const string ConnectionString = @"Data Source=192.168.1.3\SQLSERVER;Initial Catalog=Orthography;Persist Security Info=True;User ID=sa;Password=developer";
+    private DataContext dataContext;
     private List<Word> Words;
     private Word word;
     private bool showResult;
@@ -89,6 +98,7 @@ else
     private const string clear = "black";
     private const string correct = "green";
     private const string wrong = "red";
+    private bool[] cbStates = new bool[9];
     private string[] colors = new string[]
     {
         clear,
@@ -100,34 +110,37 @@ else
         clear,
         clear,
         clear
-                                    };
-    private bool[] cbStates = new bool[9];
+                    };
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        Words = new List<Word> {
-            new Word {
-                ID = 1,
-                PrepositionsMask = 265,
-                Value = "avoir",
-                Translation = "иметь"
-            },
-            new Word {
-                ID = 2,
-                PrepositionsMask = 2,
-                Value = "faire",
-                Translation = "делать"
-            },
-            new Word {
-                ID = 3,
-                PrepositionsMask = 3,
-                Value = "aller",
-                Translation = "идти"
-            }
-        };
-        word = Words[0];
+        dataContext = new DataContext(ConnectionString);
+
+        var wordIds = dataContext.Relations.Select(p => p.WordID).Distinct().ToList();
+        Words = dataContext.Words.Where(p => p.PrepositionsMask > 0 && wordIds.Contains(p.ID)).ToList();
+
+        GetWord();
+    }
+
+    private void GetWord()
+    {
+        if (Words.Count <= 0)
+        {
+            word = null;
+            return;
+        }
+        var rnd = new Random(DateTime.Now.Millisecond);
+        if (Words.Count == 1)
+        {
+            word = Words[0];
+        }
+        else
+        {
+            var id = rnd.Next(Words.Count - (word == null ? 0 : 1));
+            word = Words.Where(p => word == null || p.ID != word.ID).ToList()[id];
+        }
     }
 
     private void CheckAnswer()
@@ -155,9 +168,7 @@ else
     {
         showResult = false;
         Reset();
-        var words = Words.Where(p => p.ID != word.ID).ToList();
-        var id = new Random(DateTime.Now.Millisecond).Next(words.Count);
-        word = words[id];
+        GetWord();
         resultValue = false;
     }
 
