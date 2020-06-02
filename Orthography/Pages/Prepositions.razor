@@ -12,6 +12,19 @@ else
             <div class="col-sm" />
             <div class="col-sm" style="text-align:center">
                 <h1><b>@word.Value</b></h1>
+                <a type="button" class="btn btn-outline-warning mb-3" @onclick="() => showTranslation = !showTranslation">
+                    Translation:
+                    <b>
+                        @if (showTranslation)
+                        {
+                            @word.Translation
+                        }
+                        else
+                        {
+                            @("XXXXXXXXXX")
+                        }
+                    </b>
+                </a>
             </div>
             <div class="col-sm" />
         </div>
@@ -95,6 +108,7 @@ else
     private Word word;
     private bool showResult;
     private bool resultValue;
+    private bool showTranslation;
     private const string clear = "black";
     private const string correct = "green";
     private const string wrong = "red";
@@ -110,17 +124,14 @@ else
         clear,
         clear,
         clear
-                    };
+    };
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
         dataContext = new DataContext(ConnectionString);
-
-        var wordIds = dataContext.Relations.Select(p => p.WordID).Distinct().ToList();
-        Words = dataContext.Words.Where(p => p.PrepositionsMask > 0 && wordIds.Contains(p.ID)).ToList();
-
+        Words = dataContext.Words.Where(p => p.PrepositionsMask > 0).ToList();
         GetWord();
     }
 
