@@ -15,5 +15,10 @@ namespace Orthography.Shared
 		private Db() : base(ConnectionString)
 		{
 		}
+
+		public static void Save()
+		{
+			Context.SaveChanges();
+		}
 	}
 }
