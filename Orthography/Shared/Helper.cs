@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Orthography.Shared
+﻿namespace Orthography.Shared
 {
 	public static class Helper
 	{
