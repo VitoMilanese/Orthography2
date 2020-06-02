@@ -8,8 +8,8 @@
 
     private void Do()
     {
-        var word1 = input.Trim().Replace("’", "'");
-        var word2 = Db.Context.Relations.FirstOrDefault(p => p.ID == 3046).Result;
+        var word1 = input.ToLower().Trim().Replace("’", "'");
+        var word2 = Db.Context.Relations.FirstOrDefault(p => p.ID == 2870).Result;
         var equal = word1 == word2;
     }
 }
