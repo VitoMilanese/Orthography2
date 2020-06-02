@@ -93,8 +93,6 @@
 </table>
 
 @code {
-    private const string ConnectionString = @"Data Source=192.168.1.3\SQLSERVER;Initial Catalog=Orthography;Persist Security Info=True;User ID=sa;Password=developer";
-    private DataContext dataContext;
     private List<Word> Words;
     private bool[] cbStates = new bool[9];
     private int m_selectedWord;
@@ -115,9 +113,7 @@
     {
         base.OnInitialized();
 
-        dataContext = new DataContext(ConnectionString);
-
-        Words = dataContext.Words.OrderBy(p => p.Value).ToList();
+        Words = Db.Context.Words.OrderBy(p => p.Value).ToList();
     }
 
     private void Previous()
@@ -155,8 +151,8 @@
             if (i > 0) bitmask <<= 1;
         }
         var selected = Words[selectedWordListId];
-        var word = dataContext.Words.FirstOrDefault(p => p.ID == selected.ID);
+        var word = Db.Context.Words.FirstOrDefault(p => p.ID == selected.ID);
         selected.PrepositionsMask = word.PrepositionsMask = bitmask;
-        dataContext.SaveChanges();
+        Db.Context.SaveChanges();
     }
 }

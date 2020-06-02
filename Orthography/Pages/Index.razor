@@ -148,8 +148,6 @@ else
 }
 
 @code {
-    private const string ConnectionString = @"Data Source=192.168.1.3\SQLSERVER;Initial Catalog=Orthography;Persist Security Info=True;User ID=sa;Password=developer";
-    private DataContext dataContext;
     private List<Word> Words;
     private List<Mode> Modes;
     private List<Number> Numbers;
@@ -182,9 +180,9 @@ else
             var persons = rr.Select(p => p.PersonID).Distinct().ToList();
             var genders = rr.Select(p => p.GenderID).Distinct().ToList();
 
-            Numbers = dataContext.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
-            Persons = dataContext.Persons.Where(p => persons.Contains(p.ID)).ToList();
-            Genders = dataContext.Genders.Where(p => genders.Contains(p.ID)).ToList();
+            Numbers = Db.Context.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
+            Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
+            Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
 
             selectedPerson = Persons[0].ID;
             selectedNumber = Numbers[0].ID;
@@ -196,15 +194,13 @@ else
     {
         base.OnInitialized();
 
-        dataContext = new DataContext(ConnectionString);
-
         Modes = new List<Mode>();
         Persons = new List<Person>();
         Numbers = new List<Number>();
         Genders = new List<Gender>();
 
-        var wordIds = dataContext.Relations.Select(p => p.WordID).Distinct().ToList();
-        Words = dataContext.Words.Where(p => wordIds.Contains(p.ID)).ToList();
+        var wordIds = Db.Context.Relations.Select(p => p.WordID).Distinct().ToList();
+        Words = Db.Context.Words.Where(p => wordIds.Contains(p.ID)).ToList();
 
         GetWord();
     }
@@ -271,12 +267,12 @@ else
 
         inputText = string.Empty;
 
-        relations = dataContext.Relations.Where(p => p.WordID == word.ID).ToList();
+        relations = Db.Context.Relations.Where(p => p.WordID == word.ID).ToList();
         var ruleIds = relations.Select(p => p.RuleID);
-        rules = dataContext.Rules.Where(p => ruleIds.Contains(p.ID)).ToList();
+        rules = Db.Context.Rules.Where(p => ruleIds.Contains(p.ID)).ToList();
 
         var modes = rules.Select(p => p.ModeID).Distinct().ToList();
-        Modes = dataContext.Modes.Where(p => modes.Contains(p.ID)).ToList();
+        Modes = Db.Context.Modes.Where(p => modes.Contains(p.ID)).ToList();
         if (!randomMode)
             selectedMode = Modes[0].ID;
         else
@@ -289,8 +285,8 @@ else
         var persons = rules.Select(p => p.PersonID).Distinct().ToList();
         var genders = rules.Select(p => p.GenderID).Distinct().ToList();
 
-        Numbers = dataContext.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
-        Persons = dataContext.Persons.Where(p => persons.Contains(p.ID)).ToList();
-        Genders = dataContext.Genders.Where(p => genders.Contains(p.ID)).ToList();
+        Numbers = Db.Context.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
+        Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
+        Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
     }
 }

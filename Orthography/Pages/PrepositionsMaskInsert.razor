@@ -5,15 +5,11 @@
 <button type="button" class="btn btn-success mt-1" style="min-height: 30pt; min-width: 100px" @onclick="Save">Save</button>
 
 @code {
-    private const string ConnectionString = @"Data Source=192.168.1.3\SQLSERVER;Initial Catalog=Orthography;Persist Security Info=True;User ID=sa;Password=developer";
-    private DataContext dataContext;
     private string input;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
-        dataContext = new DataContext(ConnectionString);
     }
 
     private void Save()
@@ -36,10 +32,10 @@
             var word = cols[0];
             var translation = cols.Count > 10 ? cols[10] : null;
             var bitmask = Helper.ArrayToBitmask(bitmaskArray);
-            var existing = dataContext.Words.FirstOrDefault(p => p.Value.ToLower() == word);
+            var existing = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower() == word);
             if (existing == null)
             {
-                dataContext.Words.Add(new Word
+                Db.Context.Words.Add(new Word
                 {
                     Value = word,
                     Translation = translation,
@@ -51,7 +47,7 @@
                 existing.PrepositionsMask = bitmask;
                 existing.Translation = existing.Translation == null ? translation : existing.Translation;
             }
-            dataContext.SaveChanges();
+            Db.Context.SaveChanges();
         }
     }
 }
