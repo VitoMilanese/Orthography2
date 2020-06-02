@@ -153,6 +153,6 @@
         var selected = Words[selectedWordListId];
         var word = Db.Context.Words.FirstOrDefault(p => p.ID == selected.ID);
         selected.PrepositionsMask = word.PrepositionsMask = bitmask;
-        Db.Context.SaveChanges();
+        Db.Save();
     }
 }
