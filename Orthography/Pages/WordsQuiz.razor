@@ -79,7 +79,6 @@ else
                 @if (!string.IsNullOrWhiteSpace(@word.Translation))
                 {
                     <a type="button" class="btn btn-outline-warning" @onclick="() => showTranslation = !showTranslation">
-                        Translation:
                         <b>
                             @if (showTranslation)
                             {
@@ -87,7 +86,7 @@ else
                             }
                             else
                             {
-                                @("XXXXXXXXXX")
+                                @("Translation")
                             }
                         </b>
                     </a>
@@ -145,6 +144,25 @@ else
                 }
             </div>
         </div>
+        @if (!string.IsNullOrWhiteSpace(answer))
+        {
+            <div class="row" style="text-align:center">
+                <div class="col-sm">
+                    <a type="button" class="btn btn-outline-warning" style="text-align:center" @onclick="ShowAnswer">
+                        <b>
+                            @if (showAnswer)
+                            {
+                                @answer
+                            }
+                            else
+                            {
+                                @("Answer")
+                            }
+                        </b>
+                    </a>
+                </div>
+            </div>
+        }
     </div>
 }
 
@@ -158,8 +176,10 @@ else
     private List<Rule> rules;
     private List<Relation> relations;
     private string inputText;
+    private string answer;
     private bool isInitialized;
     private bool showTranslation;
+    private bool showAnswer;
     private bool randomMode;
     private bool lockWord;
     private bool showResult;
@@ -229,14 +249,6 @@ else
     private async Task CheckAnswer()
     {
         if (showResult) return;
-        var selectedRule = rules.Where(p =>
-            p.ModeID == selectedMode &&
-            p.NumberID == selectedNumber &&
-            p.PersonID == selectedPerson &&
-            p.GenderID == selectedGender)
-            .Select(p => p.ID)
-            .FirstOrDefault();
-        var answer = relations.FirstOrDefault(p => p.RuleID == selectedRule).Result.Replace("’", "'");
         resultValue = (inputText?.Trim().ToLower().Replace("’", "'") ?? string.Empty) == (answer?.Trim().ToLower() ?? string.Empty);
         showResult = true;
         await Task.Run(async () =>
@@ -296,6 +308,15 @@ else
             selectedMode = Modes[id].ID;
         }
 
+        var selectedRule = rules.Where(p =>
+            p.ModeID == selectedMode &&
+            p.NumberID == selectedNumber &&
+            p.PersonID == selectedPerson &&
+            p.GenderID == selectedGender)
+            .Select(p => p.ID)
+            .FirstOrDefault();
+        answer = relations.FirstOrDefault(p => p.RuleID == selectedRule).Result.Replace("’", "'");
+
         var numbers = rules.Select(p => p.NumberID).Distinct().ToList();
         var persons = rules.Select(p => p.PersonID).Distinct().ToList();
         var genders = rules.Select(p => p.GenderID).Distinct().ToList();
@@ -303,5 +324,17 @@ else
         Numbers = Db.Context.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
         Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
         Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
+    }
+
+    private async Task ShowAnswer()
+    {
+        if (showAnswer) return;
+        showAnswer = true;
+        await Task.Run(async () =>
+        {
+            await Task.Delay(1000);
+            showAnswer = false;
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 }
