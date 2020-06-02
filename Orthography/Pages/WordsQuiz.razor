@@ -3,7 +3,7 @@
 
 @if (word == null)
 {
-    <NoWordsFound/>
+    <NoWordsFound />
 }
 else
 {
@@ -158,13 +158,13 @@ else
     private List<Rule> rules;
     private List<Relation> relations;
     private string inputText;
+    private bool isInitialized;
     private bool showTranslation;
     private bool randomMode;
     private bool lockWord;
     private bool showResult;
     private bool resultValue;
     private bool isGenerating;
-    private int selectedNumber;
     private int selectedPerson;
     private int selectedGender;
     private int m_selectedMode;
@@ -176,18 +176,31 @@ else
             m_selectedMode = value;
 
             var rr = rules.Where(p => p.ModeID == selectedMode);
+            var rnd = new Random(DateTime.Now.Millisecond);
 
             var numbers = rr.Select(p => p.NumberID).Distinct().ToList();
-            var persons = rr.Select(p => p.PersonID).Distinct().ToList();
-            var genders = rr.Select(p => p.GenderID).Distinct().ToList();
-
             Numbers = Db.Context.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
-            Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
-            Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
+            selectedNumber = Numbers[rnd.Next(Numbers.Count)].ID;
 
-            selectedPerson = Persons[0].ID;
-            selectedNumber = Numbers[0].ID;
-            selectedGender = Genders[0].ID;
+            var genders = rr.Select(p => p.GenderID).Distinct().ToList();
+            Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
+            selectedGender = Genders[rnd.Next(Genders.Count)].ID;
+        }
+    }
+    private int m_selectedNumber;
+    private int selectedNumber
+    {
+        get => m_selectedNumber;
+        set
+        {
+            m_selectedNumber = value;
+
+            var rr = rules.Where(p => p.ModeID == selectedMode && p.NumberID == selectedNumber);
+            var rnd = new Random(DateTime.Now.Millisecond);
+
+            var persons = rr.Select(p => p.PersonID).Distinct().ToList();
+            Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
+            selectedPerson = Persons[rnd.Next(Persons.Count)].ID;
         }
     }
 
@@ -204,6 +217,7 @@ else
         Words = Db.Context.Words.Where(p => wordIds.Contains(p.ID)).ToList();
 
         GetWord();
+        isInitialized = true;
     }
 
     private async Task AnswerKeyPress(KeyboardEventArgs e)
@@ -231,8 +245,8 @@ else
             showResult = false;
             if (resultValue && !lockWord)
                 await GenerateWord();
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 
     private async Task GenerateWord()
@@ -244,8 +258,8 @@ else
             await Task.Delay(100);
             GetWord();
             isGenerating = false;
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 
     private void GetWord()
@@ -275,7 +289,7 @@ else
         var modes = rules.Select(p => p.ModeID).Distinct().ToList();
         Modes = Db.Context.Modes.Where(p => modes.Contains(p.ID)).ToList();
         if (!randomMode)
-            selectedMode = Modes[0].ID;
+            selectedMode = isInitialized && Modes.Any(p => p.ID == selectedMode) ? selectedMode : Modes[0].ID;
         else
         {
             var id = rnd.Next(Modes.Count);
