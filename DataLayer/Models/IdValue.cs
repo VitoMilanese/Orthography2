@@ -1,7 +1,10 @@
-﻿namespace DataLayer.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DataLayer.Models
 {
 	public class IdValue
 	{
+		[Key]
 		public int ID { get; set; }
 		public string Value { get; set; }
 
