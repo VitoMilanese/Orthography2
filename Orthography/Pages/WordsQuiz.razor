@@ -185,8 +185,6 @@ else
     private bool showResult;
     private bool resultValue;
     private bool isGenerating;
-    private int selectedPerson;
-    private int selectedGender;
     private int m_selectedMode;
     private int selectedMode
     {
@@ -200,11 +198,17 @@ else
 
             var numbers = rr.Select(p => p.NumberID).Distinct().ToList();
             Numbers = Db.Context.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
-            selectedNumber = Numbers[rnd.Next(Numbers.Count)].ID;
+            selectedNumber = Numbers[isGenerating
+                ? rnd.Next(Numbers.Count)
+                : 0
+                ].ID;
 
             var genders = rr.Select(p => p.GenderID).Distinct().ToList();
             Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
-            selectedGender = Genders[rnd.Next(Genders.Count)].ID;
+            selectedGender = Genders[isGenerating
+                ? rnd.Next(Genders.Count)
+                : 0
+                ].ID;
         }
     }
     private int m_selectedNumber;
@@ -220,7 +224,30 @@ else
 
             var persons = rr.Select(p => p.PersonID).Distinct().ToList();
             Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
-            selectedPerson = Persons[rnd.Next(Persons.Count)].ID;
+            selectedPerson = Persons[isGenerating
+                ? rnd.Next(Persons.Count)
+                : 0
+                ].ID;
+        }
+    }
+    private int m_selectedPerson;
+    private int selectedPerson
+    {
+        get => m_selectedPerson;
+        set
+        {
+            m_selectedPerson = value;
+            if (isInitialized && !isGenerating) GetAnswer();
+        }
+    }
+    private int m_selectedGender;
+    private int selectedGender
+    {
+        get => m_selectedGender;
+        set
+        {
+            m_selectedGender = value;
+            if (isInitialized && !isGenerating) GetAnswer();
         }
     }
 
@@ -308,6 +335,11 @@ else
             selectedMode = Modes[id].ID;
         }
 
+        GetAnswer();
+    }
+
+    private void GetAnswer()
+    {
         var selectedRule = rules.Where(p =>
             p.ModeID == selectedMode &&
             p.NumberID == selectedNumber &&
@@ -316,14 +348,6 @@ else
             .Select(p => p.ID)
             .FirstOrDefault();
         answer = relations.FirstOrDefault(p => p.RuleID == selectedRule).Result.Replace("’", "'");
-
-        var numbers = rules.Select(p => p.NumberID).Distinct().ToList();
-        var persons = rules.Select(p => p.PersonID).Distinct().ToList();
-        var genders = rules.Select(p => p.GenderID).Distinct().ToList();
-
-        Numbers = Db.Context.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
-        Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
-        Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
     }
 
     private async Task ShowAnswer()
