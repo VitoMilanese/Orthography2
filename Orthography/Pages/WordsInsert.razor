@@ -1,0 +1,319 @@
+﻿@page "/insert"
+
+<table class="col-12">
+    <tr>
+        <td class="col-2">
+            <label for="mode">Mode: </label>
+            <select id="mode" class="form-control col-12" @bind="@selectedMode">
+                @foreach (var mode in Modes)
+                {
+                    <option value="@mode.ID">
+                        @mode.Value
+                    </option>
+                }
+            </select>
+            <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" id="cbAllowEmpty" @bind="@allowEmpty" />
+                <label for="cbAllowEmpty" class="custom-control-label">Allow empty</label>
+            </div>
+            @if (@allowEmpty)
+            {
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="cbFillEmpty" @bind="@fillEmpty" />
+                    <label for="cbFillEmpty" class="custom-control-label">Fill empty</label>
+                </div>
+            }
+        </td>
+        <td class="col-8">
+            <table align="center">
+                <tr>
+                    <td style="min-width:100px; background-color:lightgreen">
+                        <div class="custom-control custom-checkbox m-2">
+                            <input type="checkbox" class="custom-control-input" id="cbAny" @bind="@genderAny">
+                            <label for="cbAny" class="custom-control-label">Any</label>
+                        </div>
+                    </td>
+                    <td style="min-width:100px; background-color:lightblue">
+                        <div class="custom-control custom-checkbox m-2">
+                            <input type="checkbox" class="custom-control-input" id="cbMale" @bind="@genderMale">
+                            <label for="cbMale" class="custom-control-label">Male</label>
+                        </div>
+                    </td>
+                    <td style="min-width:100px; background-color:lightpink">
+                        <div class="custom-control custom-checkbox m-2">
+                            <input type="checkbox" class="custom-control-input" id="cbFemale" @bind="@genderFemale">
+                            <label for="cbFemale" class="custom-control-label">Female</label>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td class="col-2" />
+    </tr>
+</table>
+
+<table align="center">
+    <tr>
+        @if (@genderAny)
+        {
+            <td style="background-color: lightgreen">
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb0" @bind="@cbStates[0]">
+                    <label for="cb0" class="custom-control-label">1S</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[1]">
+                    <label for="cb1" class="custom-control-label">2S</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb2" @bind="@cbStates[2]">
+                    <label for="cb2" class="custom-control-label">3S</label>
+                </div>
+            </td>
+            <td style="background-color: lightgreen" width="15px" />
+            <td style="background-color: lightgreen">
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb3" @bind="@cbStates[3]">
+                    <label for="cb3" class="custom-control-label">1P</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb4" @bind="@cbStates[4]">
+                    <label for="cb4" class="custom-control-label">2P</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb5" @bind="@cbStates[5]">
+                    <label for="cb5" class="custom-control-label">3P</label>
+                </div>
+            </td>
+        }
+        @if (@genderMale)
+        {
+            <td width="7px" />
+            <td style="@style2" width="7px" />
+            <td style="background-color: lightblue">
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb6" @bind="@cbStates[6]">
+                    <label for="cb6" class="custom-control-label">1SM</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb7" @bind="@cbStates[7]">
+                    <label for="cb7" class="custom-control-label">2SM</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb8" @bind="@cbStates[8]">
+                    <label for="cb8" class="custom-control-label">3SM</label>
+                </div>
+            </td>
+            <td style="background-color: lightblue" width="15px" />
+            <td style="background-color: lightblue">
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb9" @bind="@cbStates[9]">
+                    <label for="cb9" class="custom-control-label">1PM</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb10" @bind="@cbStates[10]">
+                    <label for="cb10" class="custom-control-label">2PM</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb11" @bind="@cbStates[11]">
+                    <label for="cb11" class="custom-control-label">3PM</label>
+                </div>
+            </td>
+        }
+        @if (@genderFemale)
+        {
+            <td width="7px" />
+            <td style="@style3" width="7px" />
+            <td style="background-color: lightpink">
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb12" @bind="@cbStates[12]">
+                    <label for="cb12" class="custom-control-label">1SF</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb13" @bind="@cbStates[13]">
+                    <label for="cb13" class="custom-control-label">2SF</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb14" @bind="@cbStates[14]">
+                    <label for="cb14" class="custom-control-label">3SF</label>
+                </div>
+            </td>
+            <td style="background-color: lightpink" width="15px" />
+            <td style="background-color: lightpink">
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb15" @bind="@cbStates[15]">
+                    <label for="cb15" class="custom-control-label">1PF</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb16" @bind="@cbStates[16]">
+                    <label for="cb16" class="custom-control-label">2PF</label>
+                </div>
+                <div class="custom-control custom-checkbox m-2">
+                    <input type="checkbox" class="custom-control-input" id="cb17" @bind="@cbStates[17]">
+                    <label for="cb17" class="custom-control-label">3PF</label>
+                </div>
+            </td>
+        }
+    </tr>
+</table>
+<textarea class="form-group col-12 mt-1" rows="10" @bind="@input" />
+<center>
+    <button type="button" class="btn btn-success mt-1" style="min-height: 30pt; min-width: 100px" @onclick="Save">Save</button>
+</center>
+
+@code {
+    private List<Mode> Modes;
+    private int selectedMode;
+    private bool allowEmpty;
+    private bool fillEmpty;
+    private bool[] cbStates = new bool[18];
+    private Rule[] cbRules = new Rule[18];
+    private const string style = "border-left: 1px solid black";
+    private string style2 => genderAny ? style : string.Empty;
+    private string style3 => genderAny || genderMale ? style : string.Empty;
+    private string input;
+    private bool m_genderAny;
+    private bool genderAny
+    {
+        get => m_genderAny;
+        set
+        {
+            m_genderAny = value;
+            for (var i = 0; i < 6; ++i)
+                cbStates[i] = value;
+        }
+    }
+    private bool m_genderMale;
+    private bool genderMale
+    {
+        get => m_genderMale;
+        set
+        {
+            m_genderMale = value;
+            for (var i = 6; i < 12; ++i)
+                cbStates[i] = value;
+        }
+    }
+    private bool m_genderFemale;
+    private bool genderFemale
+    {
+        get => m_genderFemale;
+        set
+        {
+            m_genderFemale = value;
+            for (var i = 12; i < 18; ++i)
+                cbStates[i] = value;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        Modes = Db.Context.Modes.ToList();
+        if (Modes.Count > 0)
+            selectedMode = Modes[0].ID;
+
+        var persons = Db.Context.Persons.Where(p => p.ID > 1).Select(p => p.ID).ToArray();
+        var numbers = Db.Context.Numbers.Where(p => p.ID > 1).Select(p => p.ID).ToArray();
+        var genders = Db.Context.Genders.Select(p => p.ID).ToArray();
+
+        if (persons.Length < 3) throw new Exception("Must be 3 persons");
+        if (numbers.Length < 2) throw new Exception("Must be 2 numbers");
+        if (genders.Length < 2) throw new Exception("Must be 3 genders");
+
+        for (var i = 0; i < cbRules.Length; ++i)
+        {
+            cbRules[i] = new Rule
+            {
+                PersonID = persons[i % 3],
+                NumberID = numbers[(i % 6) / 3],
+                GenderID = genders[i / 6]
+            };
+        }
+
+        genderAny = true;
+    }
+
+    private void Save()
+    {
+        if (string.IsNullOrWhiteSpace(input)) return;
+        var lines = input.Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
+        var empty = fillEmpty ? "-" : string.Empty;
+        foreach (var line in lines)
+        {
+            var cols = line.Split('\t').Select(p => p.ToLower().Trim()).Select(p => string.IsNullOrWhiteSpace(p) ? string.Empty : p).ToList();
+            var hasEmpty = cols.Contains(string.Empty);
+            if (hasEmpty && !allowEmpty) continue;
+            if (hasEmpty && fillEmpty)
+                for (var i = 0; i < cols.Count; ++i)
+                    if (string.IsNullOrWhiteSpace(cols[i])) cols[i] = empty;
+
+            var rules = new List<Rule>();
+            for (var i = 0; i < cbRules.Length; ++i)
+            {
+                cbRules[i].ID = 0;
+                cbRules[i].ModeID = cbStates[i] ? selectedMode : 0;
+            }
+            foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
+            {
+                var existingRule = Db.Context.Rules.FirstOrDefault(p =>
+                    p.ModeID == rule.ModeID &&
+                    p.PersonID == rule.PersonID &&
+                    p.NumberID == rule.NumberID &&
+                    p.GenderID == rule.GenderID);
+                if (existingRule != null)
+                { }// rule.ID = existingRule.ID;
+                else //if (rule.ModeID == selectedMode)
+                    Db.Context.Rules.Add(new Rule
+                    {
+                        ModeID = selectedMode,
+                        PersonID = rule.PersonID,
+                        NumberID = rule.NumberID,
+                        GenderID = rule.GenderID
+                    });
+            }
+            Db.Save(); // necessary to generate IDs for new rules
+            foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
+            {
+                rule.ID = Db.Context.Rules.FirstOrDefault(p =>
+                    p.ModeID == rule.ModeID &&
+                    p.PersonID == rule.PersonID &&
+                    p.NumberID == rule.NumberID &&
+                    p.GenderID == rule.GenderID)
+                    .ID;
+            }
+
+            var word = cols[0];
+            var existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
+            if (existingWord == null)
+            {
+                existingWord = new Word
+                {
+                    Value = word
+                };
+                Db.Context.Words.Add(existingWord);
+                Db.Save(); // necessary to generate IDs for new word
+                existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
+            }
+
+            var colId = 1;
+            for (var i = 0; i < cbRules.Length; ++i)
+            {
+                if (cbRules[i].ModeID == 0) continue;
+                var existingRelation = Db.Context.Relations.FirstOrDefault(p => p.RuleID == cbRules[i].ID && p.WordID == existingWord.ID);
+                if (existingRelation != null)
+                    Db.Context.Relations.Remove(existingRelation);
+                Db.Context.Relations.Add(new Relation
+                {
+                    WordID = existingWord.ID,
+                    RuleID = cbRules[i].ID,
+                    Result = colId < cols.Count ? cols[colId] : empty
+                });
+                ++colId;
+            }
+
+            Db.Save();
+        }
+    }
+}
