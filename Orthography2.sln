@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayer", "DataLayer\Data
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayerTest", "DataLayerTest\DataLayerTest.csproj", "{CC9C34D7-A953-41D8-8CB3-21A75B138767}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orthography", "Orthography\Orthography.csproj", "{3DBF532F-9D2F-4D8D-B269-CF38A5E38A4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orthography", "Orthography\Orthography.csproj", "{3DBF532F-9D2F-4D8D-B269-CF38A5E38A4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
