@@ -139,8 +139,8 @@
     private void Reset()
     {
         var bits = (selectedWordListId >= 0 && selectedWordListId < Words.Count)
-            ? BitmaskToArray((int)Words[selectedWordListId].PrepositionsMask)
-            : BitmaskToArray(0);
+            ? Helper.BitmaskToArray((int)Words[selectedWordListId].PrepositionsMask, 9)
+            : Helper.BitmaskToArray(0, 9);
         for (var i = 0; i < cbStates.Length; ++i)
             cbStates[i] = bits[i];
     }
@@ -158,16 +158,5 @@
         var word = dataContext.Words.FirstOrDefault(p => p.ID == selected.ID);
         selected.PrepositionsMask = word.PrepositionsMask = bitmask;
         dataContext.SaveChanges();
-    }
-
-    private bool[] BitmaskToArray(int bitmask)
-    {
-        var res = new bool[9];
-        for (var i = 0; i < 9; ++i)
-        {
-            res[i] = bitmask % 2 > 0;
-            bitmask >>= 1;
-        }
-        return res;
     }
 }
