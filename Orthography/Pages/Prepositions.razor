@@ -168,7 +168,6 @@ else
         for (var i = 0; i < cbStates.Length; ++i)
         {
             var f = cbStates[i] == bits[i];
-            Console.WriteLine($"{cbStates[i]}   {bits[i]}    {f}");
             resultValue &= f;
             colors[i] = f ? correct : wrong;
         }
