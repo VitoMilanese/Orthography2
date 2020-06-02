@@ -15,7 +15,7 @@
     private void Save()
     {
         if (string.IsNullOrWhiteSpace(input)) return;
-        var lines = input.Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
+        var lines = input.Replace("’", "'").Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
         foreach (var line in lines)
         {
             var cols = line.Split('\t').Select(p => p.ToLower().Trim()).Select(p => string.IsNullOrWhiteSpace(p) ? "0" : p).ToList();
@@ -31,7 +31,7 @@
             var word = cols[0];
             var translation = cols.Count > 10 ? cols[10] : null;
             var bitmask = Helper.ArrayToBitmask(bitmaskArray);
-            var existing = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower() == word);
+            var existing = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Replace("’", "'") == word);
             if (existing == null)
             {
                 Db.Context.Words.Add(new Word

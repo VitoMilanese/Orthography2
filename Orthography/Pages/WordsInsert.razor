@@ -238,7 +238,7 @@
     private void Save()
     {
         if (string.IsNullOrWhiteSpace(input)) return;
-        var lines = input.Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
+        var lines = input.Replace("’", "'").Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
         var empty = fillEmpty ? "-" : string.Empty;
         foreach (var line in lines)
         {
@@ -285,7 +285,7 @@
             }
 
             var word = cols[0];
-            var existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
+            var existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim().Replace("’", "'") == word);
             if (existingWord == null)
             {
                 existingWord = new Word

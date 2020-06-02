@@ -236,8 +236,8 @@ else
             p.GenderID == selectedGender)
             .Select(p => p.ID)
             .FirstOrDefault();
-        var answer = relations.FirstOrDefault(p => p.RuleID == selectedRule).Result;
-        resultValue = (inputText?.Trim().ToLower() ?? string.Empty) == (answer?.Trim().ToLower() ?? string.Empty);
+        var answer = relations.FirstOrDefault(p => p.RuleID == selectedRule).Result.Replace("’", "'");
+        resultValue = (inputText?.Trim().ToLower().Replace("’", "'") ?? string.Empty) == (answer?.Trim().ToLower() ?? string.Empty);
         showResult = true;
         await Task.Run(async () =>
         {

@@ -107,13 +107,13 @@
             Reset();
         }
     }
-    private string selectedWord => Words.FirstOrDefault(p => p.ID == selectedWordId)?.Value ?? "<not selected>";
+    private string selectedWord => Words.FirstOrDefault(p => p.ID == selectedWordId)?.Value.Replace("’", "'") ?? "<not selected>";
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
 
-        Words = Db.Context.Words.OrderBy(p => p.Value).ToList();
+        Words = Db.Context.Words.OrderBy(p => p.Value.Replace("’", "'")).ToList();
     }
 
     private void Previous()

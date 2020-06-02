@@ -1,4 +1,15 @@
 ﻿@page "/test"
 
+<textarea class="form-group col-12" style="resize:none" rows="10" @bind="@input" />
+<button type="button" class="btn btn-success mt-1" style="min-height: 30pt; min-width: 100px" @onclick="Do">Do</button>
+
 @code {
+    private string input;
+
+    private void Do()
+    {
+        var word1 = input.Trim().Replace("’", "'");
+        var word2 = Db.Context.Relations.FirstOrDefault(p => p.ID == 3046).Result;
+        var equal = word1 == word2;
+    }
 }
