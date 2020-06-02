@@ -1,0 +1,45 @@
+﻿@page "/translations"
+
+<table width="100%">
+    <tr>
+        <td width="50%">
+            <textarea class="form-group col-12" style="resize:none" rows="10" @bind="@inputWords" />
+        </td>
+        <td width="50%">
+            <textarea class="form-group col-12" style="resize:none" rows="10" @bind="@inputTranslations" />
+        </td>
+    </tr>
+</table>
+<button type="button" class="btn btn-success mt-1" style="min-height: 30pt; min-width: 100px" @onclick="Save">Save</button>
+
+@code {
+    private string inputWords;
+    private string inputTranslations;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private void Save()
+    {
+        if (string.IsNullOrWhiteSpace(inputWords) || string.IsNullOrWhiteSpace(inputTranslations)) return;
+        var words = inputWords.ToLower().Split('\n').Select(p => p.Trim()).ToArray();
+        var translations = inputTranslations.ToLower().Split('\n').Select(p => p.Trim()).ToArray();
+        var end = Math.Min(words.Length, translations.Length);
+        for (var i = 0; i < end; ++i)
+        {
+            if (string.IsNullOrEmpty(words[i])) continue;
+            var existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim() == words[i]);
+            if (existingWord != null)
+                existingWord.Translation = translations[i];
+            else
+                Db.Context.Words.Add(new Word
+                {
+                    Value = words[i],
+                    Translation = translations[i]
+                });
+        }
+        Db.Save();
+    }
+}
