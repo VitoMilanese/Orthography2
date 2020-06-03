@@ -1,15 +1,27 @@
 ﻿@page "/test"
 
-<textarea class="form-group col-12" style="resize:none" rows="10" @bind="@input" />
+<label for="sel">Select: </label>
+<select id="sel" class="form-control col-12" @bind="@selectedId">
+    <option value="1">
+        11111111
+    </option>
+    <option value="2" disabled>
+        22222222
+    </option>
+    <option value="3">
+        33333333
+    </option>
+</select>
 <button type="button" class="btn btn-success mt-1" style="min-height: 30pt; min-width: 100px" @onclick="Do">Do</button>
 
 @code {
-    private string input;
+    private int selectedId = 1;
 
     private void Do()
     {
-        var word1 = input.ToLower().Trim().Replace("’", "'");
-        var word2 = Db.Context.Relations.FirstOrDefault(p => p.ID == 2870).Result;
-        var equal = word1 == word2;
+        if (selectedId < 3)
+            selectedId++;
+        else
+            selectedId = 1;
     }
 }

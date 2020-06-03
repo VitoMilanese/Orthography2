@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataLayer.Models
 {
@@ -7,6 +8,8 @@ namespace DataLayer.Models
 		[Key]
 		public int ID { get; set; }
 		public string Value { get; set; }
+		[NotMapped]
+		public bool Disabled { get; set; }
 
 		public IdValue()
 		{

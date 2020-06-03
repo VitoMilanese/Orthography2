@@ -15,7 +15,7 @@ else
                 <select id="mode" class="form-control col-12" disabled="@randomMode" @bind="@selectedMode">
                     @foreach (var mode in Modes)
                     {
-                        <option value="@mode.ID">
+                        <option value="@mode.ID" disabled="@mode.Disabled">
                             @mode.Value
                         </option>
                     }
@@ -36,7 +36,7 @@ else
                 <select id="number" class="form-control" @bind="@selectedNumber">
                     @foreach (var number in Numbers)
                     {
-                        <option value="@number.ID">
+                        <option value="@number.ID" disabled="@number.Disabled">
                             @number.Value
                         </option>
                     }
@@ -50,7 +50,7 @@ else
                 <select id="person" class="form-control" @bind="@selectedPerson">
                     @foreach (var person in Persons)
                     {
-                        <option value="@person.ID">
+                        <option value="@person.ID" disabled="@person.Disabled">
                             @person.Value
                         </option>
                     }
@@ -64,7 +64,7 @@ else
                 <select id="gender" class="form-control" @bind="@selectedGender">
                     @foreach (var gender in Genders)
                     {
-                        <option value="@gender.ID">
+                        <option value="@gender.ID" disabled="@gender.Disabled">
                             @gender.Value
                         </option>
                     }
@@ -197,18 +197,27 @@ else
             var rnd = new Random(DateTime.Now.Millisecond);
 
             var numbers = rr.Select(p => p.NumberID).Distinct().ToList();
-            Numbers = Db.Context.Numbers.Where(p => numbers.Contains(p.ID)).ToList();
-            selectedNumber = Numbers[isGenerating
-                ? rnd.Next(Numbers.Count)
-                : 0
-                ].ID;
+            foreach (var number in Numbers)
+                number.Disabled = !numbers.Any(p => p == number.ID);
+            var enabledN = Numbers.Where(p => !p.Disabled).ToArray();
+            if (isGenerating)
+                selectedNumber = enabledN.Length > 0 ? enabledN[rnd.Next(enabledN.Length)].ID : 0;
+            else
+                selectedNumber = Numbers.FirstOrDefault(p => p.ID == selectedNumber && !p.Disabled)?.ID
+            ?? Numbers.FirstOrDefault(p => !p.Disabled)?.ID
+            ?? 0;
 
             var genders = rr.Select(p => p.GenderID).Distinct().ToList();
-            Genders = Db.Context.Genders.Where(p => genders.Contains(p.ID)).ToList();
-            selectedGender = Genders[isGenerating
-                ? rnd.Next(Genders.Count)
-                : 0
-                ].ID;
+            foreach (var gender in Genders)
+                gender.Disabled = !genders.Any(p => p == gender.ID);
+
+            var enabledG = Genders.Where(p => !p.Disabled).ToArray();
+            if (isGenerating)
+                selectedGender = enabledG.Length > 0 ? enabledG[rnd.Next(enabledG.Length)].ID : 0;
+            else
+                selectedGender = Genders.FirstOrDefault(p => p.ID == selectedGender && !p.Disabled)?.ID
+            ?? Genders.FirstOrDefault(p => !p.Disabled)?.ID
+            ?? 0;
         }
     }
     private int m_selectedNumber;
@@ -223,11 +232,15 @@ else
             var rnd = new Random(DateTime.Now.Millisecond);
 
             var persons = rr.Select(p => p.PersonID).Distinct().ToList();
-            Persons = Db.Context.Persons.Where(p => persons.Contains(p.ID)).ToList();
-            selectedPerson = Persons[isGenerating
-                ? rnd.Next(Persons.Count)
-                : 0
-                ].ID;
+            foreach (var person in Persons)
+                person.Disabled = !persons.Any(p => p == person.ID);
+            var enabled = Persons.Where(p => !p.Disabled).ToArray();
+            if (isGenerating)
+                selectedPerson = enabled.Length > 0 ? enabled[rnd.Next(enabled.Length)].ID : 0;
+            else
+                selectedPerson = Persons.FirstOrDefault(p => p.ID == selectedPerson && !p.Disabled)?.ID
+                    ?? Persons.FirstOrDefault(p => !p.Disabled)?.ID
+                    ?? 0;
         }
     }
     private int m_selectedPerson;
@@ -255,10 +268,10 @@ else
     {
         base.OnInitialized();
 
-        Modes = new List<Mode>();
-        Persons = new List<Person>();
-        Numbers = new List<Number>();
-        Genders = new List<Gender>();
+        Modes = Db.Context.Modes.ToList();
+        Numbers = Db.Context.Numbers.ToList();
+        Persons = Db.Context.Persons.ToList();
+        Genders = Db.Context.Genders.ToList();
 
         var wordIds = Db.Context.Relations.Select(p => p.WordID).Distinct().ToList();
         Words = Db.Context.Words.Where(p => wordIds.Contains(p.ID)).ToList();
@@ -329,14 +342,20 @@ else
         rules = Db.Context.Rules.Where(p => ruleIds.Contains(p.ID)).ToList();
 
         var modes = rules.Select(p => p.ModeID).Distinct().ToList();
-        Modes = Db.Context.Modes.Where(p => modes.Contains(p.ID)).ToList();
+        foreach (var mode in Modes)
+            mode.Disabled = !modes.Any(p => p == mode.ID);
+        var enabled = Modes.Where(p => !p.Disabled).ToArray();
         if (!randomMode)
-            selectedMode = isInitialized && Modes.Any(p => p.ID == selectedMode) ? selectedMode : Modes[0].ID;
-        else
         {
-            var id = rnd.Next(Modes.Count);
-            selectedMode = Modes[id].ID;
+            if (isInitialized)
+                selectedMode = enabled.Any(p => p.ID == selectedMode) ? selectedMode : Modes[0].ID;
+            else
+                selectedMode = Modes.FirstOrDefault(p => p.ID == selectedMode && !p.Disabled)?.ID
+                    ?? Modes.FirstOrDefault(p => !p.Disabled)?.ID
+                    ?? 0;
         }
+        else
+            selectedMode = enabled.Length > 0 ? enabled[rnd.Next(enabled.Length)].ID : 0;
 
         GetAnswer();
     }
@@ -350,7 +369,7 @@ else
             p.GenderID == selectedGender)
             .Select(p => p.ID)
             .FirstOrDefault();
-        answer = relations.FirstOrDefault(p => p.RuleID == selectedRule).Result.Replace("’", "'");
+        answer = relations.FirstOrDefault(p => p.RuleID == selectedRule)?.Result.Replace("’", "'") ?? null;
     }
 
     private async Task ShowAnswer()
