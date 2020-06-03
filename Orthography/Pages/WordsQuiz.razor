@@ -1,7 +1,7 @@
 ﻿@*https://getbootstrap.com/docs/4.1/layout/grid/*@
 @page "/"
 
-@if (word == null)
+@if (selectedWord == null)
 {
     <NoWordsFound />
 }
@@ -75,14 +75,14 @@ else
     <div class="container mt-0 mt-sm-5">
         <div class="row">
             <div class="col-sm" style="text-align:center">
-                <h1><b>@word.Value</b></h1>
-                @if (!string.IsNullOrWhiteSpace(@word.Translation))
+                <h1><b>@selectedWord.Value</b></h1>
+                @if (!string.IsNullOrWhiteSpace(selectedWord.Translation))
                 {
                     <a type="button" class="btn btn-outline-warning" @onclick="() => showTranslation = !showTranslation">
                         <b>
                             @if (showTranslation)
                             {
-                                @word.Translation
+                                @selectedWord.Translation
                             }
                             else
                             {
@@ -172,9 +172,11 @@ else
     private List<Number> Numbers;
     private List<Person> Persons;
     private List<Gender> Genders;
-    private Word word;
-    private List<Rule> rules;
-    private List<Relation> relations;
+    private List<Rule> Rules;
+    private List<Relation> Relations;
+    private Word selectedWord;
+    private Rule selectedRule;
+    private Relation selectedRelation;
     private string inputText;
     private string answer;
     private bool isInitialized;
@@ -193,31 +195,17 @@ else
         {
             m_selectedMode = value;
 
-            var rr = rules.Where(p => p.ModeID == selectedMode);
-            var rnd = new Random(DateTime.Now.Millisecond);
+            var rr = Rules.Where(p => p.ModeID == selectedMode);
 
             var numbers = rr.Select(p => p.NumberID).Distinct().ToList();
             foreach (var number in Numbers)
                 number.Disabled = !numbers.Any(p => p == number.ID);
-            var enabledN = Numbers.Where(p => !p.Disabled).ToArray();
-            if (isGenerating)
-                selectedNumber = enabledN.Length > 0 ? enabledN[rnd.Next(enabledN.Length)].ID : 0;
-            else
-                selectedNumber = Numbers.FirstOrDefault(p => p.ID == selectedNumber && !p.Disabled)?.ID
-            ?? Numbers.FirstOrDefault(p => !p.Disabled)?.ID
-            ?? 0;
 
             var genders = rr.Select(p => p.GenderID).Distinct().ToList();
             foreach (var gender in Genders)
                 gender.Disabled = !genders.Any(p => p == gender.ID);
 
-            var enabledG = Genders.Where(p => !p.Disabled).ToArray();
-            if (isGenerating)
-                selectedGender = enabledG.Length > 0 ? enabledG[rnd.Next(enabledG.Length)].ID : 0;
-            else
-                selectedGender = Genders.FirstOrDefault(p => p.ID == selectedGender && !p.Disabled)?.ID
-            ?? Genders.FirstOrDefault(p => !p.Disabled)?.ID
-            ?? 0;
+            if (isInitialized && !isGenerating) GetAnswer();
         }
     }
     private int m_selectedNumber;
@@ -228,19 +216,13 @@ else
         {
             m_selectedNumber = value;
 
-            var rr = rules.Where(p => p.ModeID == selectedMode && p.NumberID == selectedNumber);
-            var rnd = new Random(DateTime.Now.Millisecond);
+            var rr = Rules.Where(p => p.ModeID == selectedMode && p.NumberID == selectedNumber);
 
             var persons = rr.Select(p => p.PersonID).Distinct().ToList();
             foreach (var person in Persons)
                 person.Disabled = !persons.Any(p => p == person.ID);
-            var enabled = Persons.Where(p => !p.Disabled).ToArray();
-            if (isGenerating)
-                selectedPerson = enabled.Length > 0 ? enabled[rnd.Next(enabled.Length)].ID : 0;
-            else
-                selectedPerson = Persons.FirstOrDefault(p => p.ID == selectedPerson && !p.Disabled)?.ID
-                    ?? Persons.FirstOrDefault(p => !p.Disabled)?.ID
-                    ?? 0;
+
+            if (isInitialized && !isGenerating) GetAnswer();
         }
     }
     private int m_selectedPerson;
@@ -268,12 +250,13 @@ else
     {
         base.OnInitialized();
 
-        Modes = Db.Context.Modes.ToList();
         Numbers = Db.Context.Numbers.ToList();
         Persons = Db.Context.Persons.ToList();
         Genders = Db.Context.Genders.ToList();
-
-        var wordIds = Db.Context.Relations.Select(p => p.WordID).Distinct().ToList();
+        Modes = Db.Context.Modes.ToList();
+        Rules = Db.Context.Rules.ToList();
+        Relations = Db.Context.Relations.ToList();
+        var wordIds = Relations.Select(p => p.WordID).Distinct().ToList();
         Words = Db.Context.Words.Where(p => wordIds.Contains(p.ID)).ToList();
 
         GetWord();
@@ -297,8 +280,8 @@ else
             showResult = false;
             if (resultValue)
                 await GenerateWord();
-            //this.StateHasChanged(); // necessary in Blazor WebAssembly
-        });
+        //this.StateHasChanged(); // necessary in Blazor WebAssembly
+    });
     }
 
     private async Task GenerateWord()
@@ -310,66 +293,71 @@ else
             await Task.Delay(100);
             GetWord();
             isGenerating = false;
-            //this.StateHasChanged(); // necessary in Blazor WebAssembly
-        });
+        //this.StateHasChanged(); // necessary in Blazor WebAssembly
+    });
     }
 
     private void GetWord()
     {
-        if (Words.Count <= 0)
+        var rnd = new Random(DateTime.Now.Millisecond);
+        Relations = Db.Context.Relations
+            .Where(p => selectedWord == null ||
+                (p.ID != selectedRelation.ID &&
+                    (!lockWord ||
+                        (p.WordID == selectedWord.ID)
+                    )
+                )
+            ).ToList();
+
+        if (Relations.Count == 0)
         {
-            // no words
+            selectedWord = null;
             return;
         }
-        var rnd = new Random(DateTime.Now.Millisecond);
-        if (!lockWord)
+
+        if (Relations.Count == 1)
+            selectedRelation = Relations[0];
+        else
         {
-            if (Words.Count == 1)
-            {
-                word = Words[0];
-            }
-            else
-            {
-                var id = rnd.Next(Words.Count - (word == null ? 0 : 1));
-                word = Words.Where(p => word == null || p.ID != word.ID).ToList()[id];
-            }
+            var availableRelations = GetRelations(randomMode ? -1 : selectedMode)
+                .Where(p =>
+                    (selectedRelation == null || p.ID != selectedRelation.ID) &&
+                    (selectedRule == null || p.RuleID != selectedRule.ID)
+                ).ToList();
+            var id = rnd.Next(availableRelations.Count);
+            selectedRelation = availableRelations[id];
         }
+
+        selectedWord = Words.FirstOrDefault(p => p.ID == selectedRelation.WordID);
+        answer = selectedRelation.Result.Replace("’", "'") ?? null;
 
         inputText = string.Empty;
 
-        relations = Db.Context.Relations.Where(p => p.WordID == word.ID).ToList();
-        var ruleIds = relations.Select(p => p.RuleID);
-        rules = Db.Context.Rules.Where(p => ruleIds.Contains(p.ID)).ToList();
+        selectedRule = Rules.FirstOrDefault(p => p.ID == selectedRelation.RuleID);
+        selectedMode = selectedRule.ModeID;
+        selectedNumber = selectedRule.NumberID;
+        selectedPerson = selectedRule.PersonID;
+        selectedGender = selectedRule.GenderID;
 
-        var modes = rules.Select(p => p.ModeID).Distinct().ToList();
+        var availableModes = Rules.Select(p => p.ModeID).Distinct().ToList();
         foreach (var mode in Modes)
-            mode.Disabled = !modes.Any(p => p == mode.ID);
-        var enabled = Modes.Where(p => !p.Disabled).ToArray();
-        if (!randomMode)
-        {
-            if (isInitialized)
-                selectedMode = enabled.Any(p => p.ID == selectedMode) ? selectedMode : Modes[0].ID;
-            else
-                selectedMode = Modes.FirstOrDefault(p => p.ID == selectedMode && !p.Disabled)?.ID
-                    ?? Modes.FirstOrDefault(p => !p.Disabled)?.ID
-                    ?? 0;
-        }
-        else
-            selectedMode = enabled.Length > 0 ? enabled[rnd.Next(enabled.Length)].ID : 0;
+            mode.Disabled = !availableModes.Any(p => p == mode.ID);
 
         GetAnswer();
     }
 
+    private IEnumerable<Relation> GetRelations(int mode = -1)
+    {
+        var availableRules = mode < 0 ? Rules : Rules.Where(p => p.ModeID == mode).ToList();
+        if (availableRules.Count == 0)
+            availableRules = Rules;
+        var relations = Relations.Where(p => availableRules.Any(q => q.ID == p.RuleID));
+        return relations;
+    }
+
     private void GetAnswer()
     {
-        var selectedRule = rules.Where(p =>
-            p.ModeID == selectedMode &&
-            p.NumberID == selectedNumber &&
-            p.PersonID == selectedPerson &&
-            p.GenderID == selectedGender)
-            .Select(p => p.ID)
-            .FirstOrDefault();
-        answer = relations.FirstOrDefault(p => p.RuleID == selectedRule)?.Result.Replace("’", "'") ?? null;
+        answer = selectedRule != null ? Relations.FirstOrDefault(p => p.RuleID == selectedRule.ID)?.Result.Replace("’", "'") ?? null : null;
     }
 
     private async Task ShowAnswer()
@@ -380,7 +368,7 @@ else
         {
             await Task.Delay(1000);
             showAnswer = false;
-            //this.StateHasChanged(); // necessary in Blazor WebAssembly
-        });
+        //this.StateHasChanged(); // necessary in Blazor WebAssembly
+    });
     }
 }
