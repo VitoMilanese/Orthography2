@@ -282,7 +282,7 @@ else
         {
             await Task.Delay(1000);
             showResult = false;
-            if (resultValue && !lockWord)
+            if (resultValue)
                 await GenerateWord();
             //this.StateHasChanged(); // necessary in Blazor WebAssembly
         });
@@ -309,14 +309,17 @@ else
             return;
         }
         var rnd = new Random(DateTime.Now.Millisecond);
-        if (Words.Count == 1)
+        if (!lockWord)
         {
-            word = Words[0];
-        }
-        else
-        {
-            var id = rnd.Next(Words.Count - (word == null ? 0 : 1));
-            word = Words.Where(p => word == null || p.ID != word.ID).ToList()[id];
+            if (Words.Count == 1)
+            {
+                word = Words[0];
+            }
+            else
+            {
+                var id = rnd.Next(Words.Count - (word == null ? 0 : 1));
+                word = Words.Where(p => word == null || p.ID != word.ID).ToList()[id];
+            }
         }
 
         inputText = string.Empty;
