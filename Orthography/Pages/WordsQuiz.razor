@@ -270,7 +270,8 @@ else
         Relations = Db.Context.Relations.ToList();
 
         Modes = Db.Context.Modes.ToList();
-        var availableModes = Rules.Select(p => p.ModeID).Distinct().ToList();
+        var availableRules = Relations.Select(p => p.RuleID).Distinct();
+        var availableModes = Rules.Where(p => availableRules.Any(q => q == p.ID)).Select(p => p.ModeID).Distinct().ToList();
         foreach (var mode in Modes)
             mode.Disabled = !availableModes.Any(p => p == mode.ID);
 
@@ -298,8 +299,8 @@ else
             showResult = false;
             if (resultValue)
                 await GenerateWord();
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 
     private async Task GenerateWord()
@@ -311,8 +312,8 @@ else
             await Task.Delay(100);
             GetWord();
             isGenerating = false;
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 
     private void GetWord()
@@ -380,7 +381,7 @@ else
             p.WordID == selectedWord.ID);
         answer = selectedRelation?.Result.Replace("’", "'") ?? null;
         quickInfo = string.Join(" - ", new List<string>
-        {
+    {
             Modes.FirstOrDefault(p => p.ID == selectedMode).Value,
             Persons.FirstOrDefault(p => p.ID == selectedPerson).Value,
             Numbers.FirstOrDefault(p => p.ID == selectedNumber).Value,
@@ -413,7 +414,7 @@ else
         {
             await Task.Delay(1000);
             showAnswer = false;
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 }
