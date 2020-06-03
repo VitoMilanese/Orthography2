@@ -240,6 +240,14 @@
         if (string.IsNullOrWhiteSpace(input)) return;
         var lines = input.Replace("’", "'").Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
         var empty = fillEmpty ? "-" : string.Empty;
+
+        var tmpRules = new List<Rule>();
+        tmpRules.AddRange(Db.Context.Rules);
+        var tmpWords = new List<Word>();
+        tmpWords.AddRange(Db.Context.Words);
+        var tmpRelations = new List<Relation>();
+        tmpRelations.AddRange(Db.Context.Relations);
+
         foreach (var line in lines)
         {
             var cols = line.Split('\t').Select(p => p.ToLower().Trim()).Select(p => string.IsNullOrWhiteSpace(p) ? string.Empty : p).ToList();
@@ -257,26 +265,27 @@
             }
             foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
             {
-                var existingRule = Db.Context.Rules.FirstOrDefault(p =>
+                var existingRule = tmpRules.FirstOrDefault(p =>
                     p.ModeID == rule.ModeID &&
                     p.PersonID == rule.PersonID &&
                     p.NumberID == rule.NumberID &&
                     p.GenderID == rule.GenderID);
-                if (existingRule != null)
-                { }// rule.ID = existingRule.ID;
-                else //if (rule.ModeID == selectedMode)
-                    Db.Context.Rules.Add(new Rule
+                if (existingRule == null)
+                {
+                    var newRule = new Rule
                     {
                         ModeID = selectedMode,
                         PersonID = rule.PersonID,
                         NumberID = rule.NumberID,
                         GenderID = rule.GenderID
-                    });
+                    };
+                    tmpRules.Add(newRule);
+                    Db.Context.Rules.Add(newRule);
+                }
             }
-            Db.Save(); // necessary to generate IDs for new rules
             foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
             {
-                rule.ID = Db.Context.Rules.FirstOrDefault(p =>
+                rule.ID = tmpRules.FirstOrDefault(p =>
                     p.ModeID == rule.ModeID &&
                     p.PersonID == rule.PersonID &&
                     p.NumberID == rule.NumberID &&
@@ -285,35 +294,39 @@
             }
 
             var word = cols[0];
-            var existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim().Replace("’", "'") == word);
+            var existingWord = tmpWords.FirstOrDefault(p => p.Value.ToLower().Trim().Replace("’", "'") == word);
             if (existingWord == null)
             {
                 existingWord = new Word
                 {
                     Value = word
                 };
+                tmpWords.Add(existingWord);
                 Db.Context.Words.Add(existingWord);
-                Db.Save(); // necessary to generate IDs for new word
-                existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
+                existingWord = tmpWords.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
             }
 
             var colId = 1;
             for (var i = 0; i < cbRules.Length; ++i)
             {
                 if (cbRules[i].ModeID == 0) continue;
-                var existingRelation = Db.Context.Relations.FirstOrDefault(p => p.RuleID == cbRules[i].ID && p.WordID == existingWord.ID);
-                if (existingRelation != null)
-                    Db.Context.Relations.Remove(existingRelation);
-                Db.Context.Relations.Add(new Relation
+                var existingRelation = tmpRelations.FirstOrDefault(p => p.RuleID == cbRules[i].ID && p.WordID == existingWord.ID);
+                if (existingRelation == null)
                 {
-                    WordID = existingWord.ID,
-                    RuleID = cbRules[i].ID,
-                    Result = colId < cols.Count ? cols[colId] : empty
-                });
+                    var newRelation = new Relation
+                    {
+                        WordID = existingWord.ID,
+                        RuleID = cbRules[i].ID,
+                        Result = colId < cols.Count ? cols[colId] : empty
+                    };
+                    tmpRelations.Add(newRelation);
+                    Db.Context.Relations.Add(newRelation);
+                }
+                else
+                    existingRelation.Result = colId < cols.Count ? cols[colId] : empty;
                 ++colId;
             }
-
-            Db.Save();
         }
+        Db.Save();
     }
 }
