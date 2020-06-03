@@ -201,11 +201,15 @@ else
             foreach (var number in Numbers)
                 number.Disabled = !numbers.Any(p => p == number.ID);
 
+            var persons = rr.Where(p => p.NumberID == selectedNumber).Select(p => p.PersonID).Distinct().ToList();
+            foreach (var person in Persons)
+                person.Disabled = !persons.Any(p => p == person.ID);
+
             var genders = rr.Select(p => p.GenderID).Distinct().ToList();
             foreach (var gender in Genders)
                 gender.Disabled = !genders.Any(p => p == gender.ID);
 
-            if (isInitialized && !isGenerating) UpdateRelation();
+            UpdateSelectionChain();
         }
     }
     private int m_selectedNumber;
@@ -222,7 +226,7 @@ else
             foreach (var person in Persons)
                 person.Disabled = !persons.Any(p => p == person.ID);
 
-            if (isInitialized && !isGenerating) UpdateRelation();
+            UpdateSelectionChain();
         }
     }
     private int m_selectedPerson;
@@ -232,7 +236,7 @@ else
         set
         {
             m_selectedPerson = value;
-            if (isInitialized && !isGenerating) UpdateRelation();
+            UpdateSelectionChain();
         }
     }
     private int m_selectedGender;
@@ -242,7 +246,7 @@ else
         set
         {
             m_selectedGender = value;
-            if (isInitialized && !isGenerating) UpdateRelation();
+            UpdateSelectionChain();
         }
     }
 
@@ -253,9 +257,14 @@ else
         Numbers = Db.Context.Numbers.ToList();
         Persons = Db.Context.Persons.ToList();
         Genders = Db.Context.Genders.ToList();
-        Modes = Db.Context.Modes.ToList();
         Rules = Db.Context.Rules.ToList();
         Relations = Db.Context.Relations.ToList();
+
+        Modes = Db.Context.Modes.ToList();
+        var availableModes = Rules.Select(p => p.ModeID).Distinct().ToList();
+        foreach (var mode in Modes)
+            mode.Disabled = !availableModes.Any(p => p == mode.ID);
+
         var wordIds = Relations.Select(p => p.WordID).Distinct().ToList();
         Words = Db.Context.Words.Where(p => wordIds.Contains(p.ID)).ToList();
 
@@ -280,8 +289,8 @@ else
             showResult = false;
             if (resultValue)
                 await GenerateWord();
-            //this.StateHasChanged(); // necessary in Blazor WebAssembly
-        });
+        //this.StateHasChanged(); // necessary in Blazor WebAssembly
+    });
     }
 
     private async Task GenerateWord()
@@ -293,8 +302,8 @@ else
             await Task.Delay(100);
             GetWord();
             isGenerating = false;
-            //this.StateHasChanged(); // necessary in Blazor WebAssembly
-        });
+        //this.StateHasChanged(); // necessary in Blazor WebAssembly
+    });
     }
 
     private void GetWord()
@@ -338,10 +347,6 @@ else
         selectedPerson = selectedRule.PersonID;
         selectedGender = selectedRule.GenderID;
 
-        var availableModes = Rules.Select(p => p.ModeID).Distinct().ToList();
-        foreach (var mode in Modes)
-            mode.Disabled = !availableModes.Any(p => p == mode.ID);
-
         UpdateRelation();
     }
 
@@ -367,6 +372,23 @@ else
         answer = selectedRelation?.Result.Replace("’", "'") ?? null;
     }
 
+    private bool updatingSelectionChain;
+    private void UpdateSelectionChain()
+    {
+        if (updatingSelectionChain) return;
+        updatingSelectionChain = true;
+        if (Modes.FirstOrDefault(p => p.ID == selectedMode)?.Disabled ?? false)
+            selectedMode = Modes.FirstOrDefault(p => !p.Disabled)?.ID ?? 0;
+        if (Numbers.FirstOrDefault(p => p.ID == selectedNumber)?.Disabled ?? false)
+            selectedNumber = Numbers.FirstOrDefault(p => !p.Disabled)?.ID ?? 0;
+        if (Persons.FirstOrDefault(p => p.ID == selectedPerson)?.Disabled ?? false)
+            selectedPerson = Persons.FirstOrDefault(p => !p.Disabled)?.ID ?? 0;
+        if (Genders.FirstOrDefault(p => p.ID == selectedGender)?.Disabled ?? false)
+            selectedGender = Genders.FirstOrDefault(p => !p.Disabled)?.ID ?? 0;
+        if (isInitialized && !isGenerating) UpdateRelation();
+        updatingSelectionChain = false;
+    }
+
     private async Task ShowAnswer()
     {
         if (showAnswer) return;
@@ -375,7 +397,7 @@ else
         {
             await Task.Delay(1000);
             showAnswer = false;
-            //this.StateHasChanged(); // necessary in Blazor WebAssembly
-        });
+        //this.StateHasChanged(); // necessary in Blazor WebAssembly
+    });
     }
 }
