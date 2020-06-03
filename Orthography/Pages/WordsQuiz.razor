@@ -73,6 +73,14 @@ else
         </div>
     </div>
     <div class="container mt-0 mt-sm-5">
+        @if (!string.IsNullOrWhiteSpace(@quickInfo))
+        {
+            <div class="row">
+                <div class="col-sm" style="text-align:center">
+                    <i>@quickInfo</i>
+                </div>
+            </div>
+        }
         <div class="row">
             <div class="col-sm" style="text-align:center">
                 <h1><b>@selectedWord.Value</b></h1>
@@ -177,6 +185,7 @@ else
     private Word selectedWord;
     private Rule selectedRule;
     private Relation selectedRelation;
+    private string quickInfo;
     private string inputText;
     private string answer;
     private bool isInitialized;
@@ -370,6 +379,13 @@ else
             p.RuleID == selectedRule.ID &&
             p.WordID == selectedWord.ID);
         answer = selectedRelation?.Result.Replace("’", "'") ?? null;
+        quickInfo = string.Join(" - ", new List<string>
+        {
+            Modes.FirstOrDefault(p => p.ID == selectedMode).Value,
+            Persons.FirstOrDefault(p => p.ID == selectedPerson).Value,
+            Numbers.FirstOrDefault(p => p.ID == selectedNumber).Value,
+            Genders.FirstOrDefault(p => p.ID == selectedGender).Value
+        }.Where(p => p.ToLower() != "any"));
     }
 
     private bool updatingSelectionChain;
