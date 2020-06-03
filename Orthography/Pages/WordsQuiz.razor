@@ -205,7 +205,7 @@ else
             foreach (var gender in Genders)
                 gender.Disabled = !genders.Any(p => p == gender.ID);
 
-            if (isInitialized && !isGenerating) GetAnswer();
+            if (isInitialized && !isGenerating) UpdateRelation();
         }
     }
     private int m_selectedNumber;
@@ -222,7 +222,7 @@ else
             foreach (var person in Persons)
                 person.Disabled = !persons.Any(p => p == person.ID);
 
-            if (isInitialized && !isGenerating) GetAnswer();
+            if (isInitialized && !isGenerating) UpdateRelation();
         }
     }
     private int m_selectedPerson;
@@ -232,7 +232,7 @@ else
         set
         {
             m_selectedPerson = value;
-            if (isInitialized && !isGenerating) GetAnswer();
+            if (isInitialized && !isGenerating) UpdateRelation();
         }
     }
     private int m_selectedGender;
@@ -242,7 +242,7 @@ else
         set
         {
             m_selectedGender = value;
-            if (isInitialized && !isGenerating) GetAnswer();
+            if (isInitialized && !isGenerating) UpdateRelation();
         }
     }
 
@@ -280,8 +280,8 @@ else
             showResult = false;
             if (resultValue)
                 await GenerateWord();
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 
     private async Task GenerateWord()
@@ -293,8 +293,8 @@ else
             await Task.Delay(100);
             GetWord();
             isGenerating = false;
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 
     private void GetWord()
@@ -330,7 +330,6 @@ else
 
         selectedWord = Words.FirstOrDefault(p => p.ID == selectedRelation.WordID);
         answer = selectedRelation.Result.Replace("’", "'") ?? null;
-
         inputText = string.Empty;
 
         selectedRule = Rules.FirstOrDefault(p => p.ID == selectedRelation.RuleID);
@@ -343,7 +342,7 @@ else
         foreach (var mode in Modes)
             mode.Disabled = !availableModes.Any(p => p == mode.ID);
 
-        GetAnswer();
+        UpdateRelation();
     }
 
     private IEnumerable<Relation> GetRelations(int mode = -1)
@@ -355,9 +354,17 @@ else
         return relations;
     }
 
-    private void GetAnswer()
+    private void UpdateRelation()
     {
-        answer = selectedRule != null ? Relations.FirstOrDefault(p => p.RuleID == selectedRule.ID)?.Result.Replace("’", "'") ?? null : null;
+        selectedRule = Rules.FirstOrDefault(p =>
+            p.ModeID == selectedMode &&
+            p.NumberID == selectedNumber &&
+            p.PersonID == selectedPerson &&
+            p.GenderID == selectedGender);
+        selectedRelation = selectedRule == null ? null : Relations.FirstOrDefault(p =>
+            p.RuleID == selectedRule.ID &&
+            p.WordID == selectedWord.ID);
+        answer = selectedRelation?.Result.Replace("’", "'") ?? null;
     }
 
     private async Task ShowAnswer()
@@ -368,7 +375,7 @@ else
         {
             await Task.Delay(1000);
             showAnswer = false;
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 }
