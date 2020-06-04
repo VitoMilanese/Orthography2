@@ -7,7 +7,7 @@ namespace DataLayer.Models
 	{
 		[Key]
 		public int ID { get; set; }
-		public string Value { get; set; }
+		public int LabelID { get; set; }
 		[NotMapped]
 		public bool Disabled { get; set; }
 
@@ -15,10 +15,10 @@ namespace DataLayer.Models
 		{
 		}
 
-		public IdValue(int id, string value)
+		public IdValue(int id, int labelID)
 		{
 			ID = id;
-			Value = value;
+			LabelID = labelID;
 		}
 	}
 }
