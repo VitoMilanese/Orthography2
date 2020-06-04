@@ -8,7 +8,7 @@
                 @foreach (var mode in Modes)
                 {
                     <option value="@mode.ID">
-                        @mode.Value
+                        @UILabels.ModeLabels[@mode.ID]
                     </option>
                 }
             </select>

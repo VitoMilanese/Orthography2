@@ -11,12 +11,12 @@ else
         <div class="form-group col-sm mr-2">
             @if (Modes.Count > 0)
             {
-                <label for="mode">Mode: </label>
+                <label for="mode">@UILabels.Labels["ui_0_mode"]: </label>
                 <select id="mode" class="form-control col-12" disabled="@randomMode" @bind="@selectedMode">
                     @foreach (var mode in Modes)
                     {
                         <option value="@mode.ID" disabled="@mode.Disabled">
-                            @mode.Value
+                            @UILabels.ModeLabels[@mode.ID]
                         </option>
                     }
                 </select>
@@ -24,7 +24,7 @@ else
                 {
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="cbRandomMode" @bind="@randomMode" />
-                        <label for="cbRandomMode" class="custom-control-label">Random</label>
+                        <label for="cbRandomMode" class="custom-control-label">@UILabels.Labels["ui_0_random"]</label>
                     </div>
                 }
             }
@@ -32,12 +32,12 @@ else
         <div class="form-group col-sm mr-2">
             @if (Numbers.Count > 0)
             {
-                <label for="number">Number: </label>
+                <label for="number">@UILabels.Labels["ui_0_number"]: </label>
                 <select id="number" class="form-control" @bind="@selectedNumber">
                     @foreach (var number in Numbers)
                     {
                         <option value="@number.ID" disabled="@number.Disabled">
-                            @number.Value
+                            @UILabels.NumberLabels[number.ID]
                         </option>
                     }
                 </select>
@@ -46,12 +46,12 @@ else
         <div class="form-group col-sm mr-2">
             @if (Persons.Count > 0)
             {
-                <label for="person">Person: </label>
+                <label for="person">@UILabels.Labels["ui_0_person"]: </label>
                 <select id="person" class="form-control" @bind="@selectedPerson">
                     @foreach (var person in Persons)
                     {
                         <option value="@person.ID" disabled="@person.Disabled">
-                            @person.Value
+                            @UILabels.PersonLabels[person.ID]
                         </option>
                     }
                 </select>
@@ -60,12 +60,12 @@ else
         <div class="form-group col-sm">
             @if (Genders.Count > 0)
             {
-                <label for="gender">Gender: </label>
+                <label for="gender">@UILabels.Labels["ui_0_gender"]: </label>
                 <select id="gender" class="form-control" @bind="@selectedGender">
                     @foreach (var gender in Genders)
                     {
                         <option value="@gender.ID" disabled="@gender.Disabled">
-                            @gender.Value
+                            @UILabels.GenderLabels[gender.ID]
                         </option>
                     }
                 </select>
@@ -94,7 +94,7 @@ else
                             }
                             else
                             {
-                                @("Translation")
+                                @UILabels.Labels["ui_0_translation"]
                             }
                         </b>
                     </a>
@@ -111,18 +111,18 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt" @onclick="GenerateWord">Reset</button>
+                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt" @onclick="GenerateWord">@UILabels.Labels["ui_0_reset"]</button>
                 }
             </div>
             <div class="col-6" style="text-align:center">
                 <div class="form-group mb-0">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="cbLockWord" @bind="lockWord" />
-                        <label for="cbLockWord" class="custom-control-label">Lock the word</label>
+                        <label for="cbLockWord" class="custom-control-label">@UILabels.Labels["ui_0_lock_word"]</label>
                     </div>
                 </div>
                 <div class="form-group col-12 mr-2 mt-0">
-                    <input type="text" class="col-12" id="answer" placeholder="Answer"
+                    <input type="text" class="col-12" id="answer" placeholder="@UILabels.Labels["ui_0_answer"]"
                            style="text-align:center;min-height:30pt"
                            @bind-value="@inputText" @bind-value:event="oninput"
                            @onkeypress="AnswerKeyPress" />
@@ -132,11 +132,11 @@ else
                     <div class="form-group mt-2">
                         @if (resultValue)
                         {
-                            <h3 style="color:green">Correct</h3>
+                            <h3 style="color:green">@UILabels.Labels["ui_0_correct"]</h3>
                         }
                         else
                         {
-                            <h3 style="color:red">Wrong</h3>
+                            <h3 style="color:red">@UILabels.Labels["ui_0_wrong"]</h3>
                         }
                     </div>
                 }
@@ -148,7 +148,7 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-info mt-4" style="min-height: 30pt" @onclick="CheckAnswer">Check</button>
+                    <button type="button" class="btn btn-info mt-4" style="min-height: 30pt" @onclick="CheckAnswer">@UILabels.Labels["ui_0_check"]</button>
                 }
             </div>
         </div>
@@ -164,7 +164,7 @@ else
                             }
                             else
                             {
-                                @("Answer")
+                                @UILabels.Labels["ui_0_answer"]
                             }
                         </b>
                     </a>
@@ -380,13 +380,21 @@ else
             p.RuleID == selectedRule.ID &&
             p.WordID == selectedWord.ID);
         answer = selectedRelation?.Result.Replace("’", "'") ?? null;
+
+        const string DEFAULT_ANY = "any";
+        var any = new[]
+        {
+            (UILabels.Labels["ui_0_number_any"]?.ToLower() ?? DEFAULT_ANY),
+            (UILabels.Labels["ui_0_person_any"]?.ToLower() ?? DEFAULT_ANY),
+            (UILabels.Labels["ui_0_gender_any"]?.ToLower() ?? DEFAULT_ANY)
+        };
         quickInfo = string.Join(" - ", new List<string>
-    {
-            Modes.FirstOrDefault(p => p.ID == selectedMode).Value,
-            Persons.FirstOrDefault(p => p.ID == selectedPerson).Value,
-            Numbers.FirstOrDefault(p => p.ID == selectedNumber).Value,
-            Genders.FirstOrDefault(p => p.ID == selectedGender).Value
-        }.Where(p => p.ToLower() != "any"));
+        {
+            UILabels.ModeLabels[Modes.FirstOrDefault(p => p.ID == selectedMode).ID] ?? UILabels.UnknownLabel,
+            UILabels.NumberLabels[Numbers.FirstOrDefault(p => p.ID == selectedNumber).ID] ?? UILabels.UnknownLabel,
+            UILabels.PersonLabels[Persons.FirstOrDefault(p => p.ID == selectedPerson).ID] ?? UILabels.UnknownLabel,
+            UILabels.GenderLabels[Genders.FirstOrDefault(p => p.ID == selectedGender).ID] ?? UILabels.UnknownLabel
+        }.Where(p => !any.Contains(p.ToLower())));
     }
 
     private bool updatingSelectionChain;
