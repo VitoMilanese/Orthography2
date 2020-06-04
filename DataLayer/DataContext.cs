@@ -36,5 +36,8 @@ namespace DataLayer
 		public DbSet<Word> Words { get; set; }
 		public DbSet<Rule> Rules { get; set; }
 		public DbSet<Relation> Relations { get; set; }
+		public DbSet<Language> Languages { get; set; }
+		public DbSet<Term> Terms { get; set; }
+		public DbSet<Label> Labels { get; set; }
 	}
 }
