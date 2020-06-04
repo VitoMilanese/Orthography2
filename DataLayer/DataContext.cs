@@ -17,11 +17,14 @@ namespace DataLayer
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseSqlServer(m_connectionString);
-			// Auto tracking
-			optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
-			// Manual tracking
-			// optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+			if (m_connectionString != null)
+			{
+				optionsBuilder.UseSqlServer(m_connectionString);
+				// Auto tracking
+				optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+				// Manual tracking
+				// optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+			}
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
