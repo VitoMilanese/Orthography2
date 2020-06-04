@@ -8,8 +8,8 @@ namespace Orthography.Shared
 	public static class UILabels
 	{
 		private const int Default_Language = 1;
-		private const int Default_ID_Language_Name = 35;
-		private const int Default_ID_Unknown_Label = 36;
+		private const int Default_ID_Language_Name = 2;
+		private const int Default_ID_Unknown_Label = 3;
 
 		public static string UnknownLabel { get; private set; }
 		public static Language CurrentLanguage { get; private set; }
@@ -21,6 +21,8 @@ namespace Orthography.Shared
 
 		private static int id_languageName;
 		private static int id_unknownLabel;
+
+		public static EventHandler OnLanguageChanged { get; set; }
 
 		static UILabels()
 		{
@@ -85,6 +87,7 @@ namespace Orthography.Shared
 			{
 				return false;
 			}
+			OnLanguageChanged?.Invoke(null, EventArgs.Empty);
 			return true;
 		}
 	}
