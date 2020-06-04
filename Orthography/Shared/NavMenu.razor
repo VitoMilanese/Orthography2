@@ -61,6 +61,7 @@
             //    ? UILabels.UnknownLabel
             //    : Db.Context.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_language_term)?.Value ?? UILabels.UnknownLabel;
         }
+        Languages = Languages.OrderBy(p => p.Label).ToList();
         selectedLanguage = UILabels.CurrentLanguage.ID;
     }
 
