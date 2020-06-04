@@ -7,23 +7,62 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
+        <li class="nav-item px-3 mb-2">
+            <label for="language" style="color:white">@UILabels.Labels["ui_language"]: </label>
+            <select id="language" class="form-control col-12" @bind="@selectedLanguage">
+                @foreach (var language in Languages)
+                {
+                    <option value="@language.ID">
+                        @language.Label
+                    </option>
+                }
+            </select>
+        </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-book" aria-hidden="true"></span> Conjugation
+                <span class="oi oi-book" aria-hidden="true"></span> @UILabels.Labels["ui_0_conjugation"]
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="prepositions">
-                <span class="oi oi-bolt" aria-hidden="true"></span> Prepositions
+                <span class="oi oi-bolt" aria-hidden="true"></span> @UILabels.Labels["ui_0_prepositions"]
             </NavLink>
         </li>
     </ul>
 </div>
 
 @code {
+    private List<Language> Languages;
     private bool collapseNavMenu = true;
+    private int m_selectedLanguage;
+    private int selectedLanguage
+    {
+        get => m_selectedLanguage;
+        set
+        {
+            m_selectedLanguage = value;
+            UILabels.SelectLanguage(m_selectedLanguage);
+        }
+    }
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Languages = Db.Context.Languages.ToList();
+        // alternative method
+        //var id_language_term = Db.Context.Terms.FirstOrDefault(p => p.Value == "ui_language")?.ID ?? -1;
+        foreach (var language in Languages)
+        {
+            language.Label = Db.Context.Labels.FirstOrDefault(p => p.ID == language.LanguageNameID)?.Value ?? UILabels.UnknownLabel;
+            // alternative method
+            //language.Label = id_language_term == -1
+            //    ? UILabels.UnknownLabel
+            //    : Db.Context.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_language_term)?.Value ?? UILabels.UnknownLabel;
+        }
+        selectedLanguage = UILabels.CurrentLanguage.ID;
+    }
 
     private void ToggleNavMenu()
     {
