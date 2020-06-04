@@ -15,7 +15,7 @@ else
                 @if (!string.IsNullOrWhiteSpace(@word.Translation))
                 {
                     <a type="button" class="btn btn-outline-warning" @onclick="() => showTranslation = !showTranslation">
-                        Translation:
+                        @UILabels.Labels["ui_1_translation"]:
                         <b>
                             @if (showTranslation)
                             {
@@ -85,21 +85,21 @@ else
     @if (showResult)
     {
         <div class="form-group" style="text-align:center">
-            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">Next</button>
+            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">@UILabels.Labels["ui_1_next"]</button>
             @if (resultValue)
             {
-                <h3 class="mt-2" style="color:green">Correct</h3>
+                <h3 class="mt-2" style="color:green">@UILabels.Labels["ui_1_correct"]</h3>
             }
             else
             {
-                <h3 class="mt-2" style="color:red">Check your errors</h3>
+                <h3 class="mt-2" style="color:red">@UILabels.Labels["ui_1_errors"]</h3>
             }
         </div>
     }
     else
     {
         <div style="text-align:center">
-            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">Check</button>
+            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILabels.Labels["ui_1_check"]</button>
         </div>
     }
 }
@@ -130,6 +130,8 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
+
+        UILabels.OnLanguageChanged = UpdateUI;
 
         Words = Db.Context.Words.Where(p => p.PrepositionsMask > 0).ToList();
         GetWord();
@@ -188,5 +190,10 @@ else
             colors[i] = "black";
         for (var i = 0; i < cbStates.Length; ++i)
             cbStates[i] = false;
+    }
+
+    private void UpdateUI(object sender, EventArgs e)
+    {
+        InvokeAsync(() => this.StateHasChanged());
     }
 }

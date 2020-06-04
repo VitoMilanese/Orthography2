@@ -278,6 +278,8 @@ else
         var wordIds = Relations.Select(p => p.WordID).Distinct().ToList();
         Words = Db.Context.Words.Where(p => wordIds.Contains(p.ID)).ToList();
 
+        UILabels.OnLanguageChanged = UpdateUI;
+
         GetWord();
         isInitialized = true;
     }
@@ -424,5 +426,10 @@ else
             showAnswer = false;
             //this.StateHasChanged(); // necessary in Blazor WebAssembly
         });
+    }
+
+    private void UpdateUI(object sender, EventArgs e)
+    {
+        InvokeAsync(() => this.StateHasChanged());
     }
 }
