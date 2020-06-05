@@ -17,16 +17,13 @@
                             © 2020 Vitalii Hanych.<br />All rights reserved.
                         </div>
                     </td>
-                    <td style="width:@($"{IconSize*3+IconMargins*6+15}px")">
-                        <a href="https://www.linkedin.com/in/vitalii-hanych-0aab7680/" target="_blank" style="text-decoration: none" class="LinkIcon">
-                            <img src="/wwwroot/images/linkedin.png" style="@iconStyle" />
-                        </a>
-                        <a href="https://www.facebook.com/vitaliy.hanych/" target="_blank" style="text-decoration: none" class="LinkIcon">
-                            <img src="/wwwroot/images/facebook.png" style="@iconStyle" />
-                        </a>
-                        <a href="https://www.instagram.com/vitaliimilano/" target="_blank" style="text-decoration: none" class="LinkIcon">
-                            <img src="/wwwroot/images/instagram.png" style="@iconStyle" />
-                        </a>
+                    <td style="width:@($"{(IconSize+IconMargins*2+5)*LinkIcons.Count}px")">
+                        @foreach (var linkIcon in LinkIcons)
+                        {
+                            <a href="@linkIcon.Key" target="_blank" style="text-decoration: none" class="LinkIcon">
+                                <img src="@linkIcon.Value" style="@iconStyle" />
+                            </a>
+                        }
                     </td>
                 </tr>
             </table>
@@ -38,4 +35,15 @@
     private const int IconSize = 35;
     private const int IconMargins = 5;
     private string iconStyle = $"width: {IconSize}px; height: {IconSize}px; margin-left: {IconMargins}px; margin-right: {IconMargins}px";
+    private List<KeyValuePair<string, string>> LinkIcons = new List<KeyValuePair<string, string>>
+{
+        new KeyValuePair<string, string>("https://www.linkedin.com/in/vitalii-hanych-0aab7680/",
+            "/wwwroot/images/linkedin.png"),
+        new KeyValuePair<string, string>("https://www.facebook.com/vitaliy.hanych/",
+            "/wwwroot/images/facebook.png"),
+        new KeyValuePair<string, string>("https://www.instagram.com/vitaliimilano/",
+            "/wwwroot/images/instagram.png"),
+        new KeyValuePair<string, string>("https://github.com/VitoMilanese/",
+            "/wwwroot/images/github.png")
+    };
 }
