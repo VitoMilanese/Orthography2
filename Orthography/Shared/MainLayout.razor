@@ -4,8 +4,38 @@
     <NavMenu />
 </div>
 
-<div class="main">
-    <div class="content px-4">
+<div class="main" id="page-container">
+    <div class="content px-4" id="content-wrap">
         @Body
     </div>
+    <div class="modal-footer" id="footer">
+        <div class="row mb-3" style="width:100%; font-size:14px">
+            <table class="col" align="right">
+                <tr>
+                    <td>
+                        <div style="text-align:right; margin-right:@($"{IconMargins}px")">
+                            © 2020 Vitalii Hanych.<br />All rights reserved.
+                        </div>
+                    </td>
+                    <td style="width:@($"{IconSize*3+IconMargins*6+15}px")">
+                        <a href="https://www.linkedin.com/in/vitalii-hanych-0aab7680/" target="_blank" style="text-decoration: none" class="LinkIcon">
+                            <img src="/images/linkedin.png" style="@iconStyle" />
+                        </a>
+                        <a href="https://www.facebook.com/vitaliy.hanych/" target="_blank" style="text-decoration: none" class="LinkIcon">
+                            <img src="/images/facebook.png" style="@iconStyle" />
+                        </a>
+                        <a href="https://www.instagram.com/vitaliimilano/" target="_blank" style="text-decoration: none" class="LinkIcon">
+                            <img src="/images/instagram.png" style="@iconStyle" />
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
+
+@code {
+    private const int IconSize = 35;
+    private const int IconMargins = 5;
+    private string iconStyle = $"width: {IconSize}px; height: {IconSize}px; margin-left: {IconMargins}px; margin-right: {IconMargins}px";
+}
