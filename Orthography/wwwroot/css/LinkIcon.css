@@ -1,0 +1,14 @@
+﻿.LinkIcon {
+    filter: unset;
+    opacity: 1;
+    transition: 0.5s;
+}
+
+.LinkIcon:hover {
+    filter: grayscale(100%);
+    opacity: 0.75;
+}
+
+.LinkIcon:focus {
+    outline: none
+}
