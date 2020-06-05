@@ -125,11 +125,11 @@ else
             <div class="col-3" style="text-align:right">
                 @if (isGenerating)
                 {
-                    <img src="https://art.pixilart.com/8afb782c4601281.gif" width="75" height="75" />
+                    <img src="/images/loading.gif" width="75" height="75" />
                 }
                 else
                 {
-                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="GenerateWord">@UILabels.Labels["ui_0_reset"]</button>
+                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="Reset">@UILabels.Labels["ui_0_reset"]</button>
                 }
             </div>
             <div class="col-6" style="text-align:center">
@@ -141,7 +141,7 @@ else
                         </label>
                     </div>
                 </div>
-                <div class="form-group col-12 mr-2 mt-0">
+                <div class="form-group col-12 mr-2 mt-0" hidden="@showResult">
                     <input type="text" class="col-12" id="answer" placeholder="@UILabels.Labels["ui_0_answer"]"
                            style="text-align:center;min-height:30pt"
                            @bind-value="@inputText" @bind-value:event="oninput"
@@ -152,11 +152,11 @@ else
                     <div class="form-group mt-2">
                         @if (resultValue)
                         {
-                            <h3 style="color:green">@UILabels.Labels["ui_0_correct"]</h3>
+                            <h3 style="color:green; margin-bottom:14pt"><b>@UILabels.Labels["ui_0_correct"]</b></h3>
                         }
                         else
                         {
-                            <h3 style="color:red">@UILabels.Labels["ui_0_wrong"]</h3>
+                            <h3 style="color:red; margin-bottom:14pt"><b>@UILabels.Labels["ui_0_wrong"]</b></h3>
                         }
                     </div>
                 }
@@ -164,7 +164,7 @@ else
             <div class="col-3" style="text-align:left">
                 @if (showResult || isGenerating)
                 {
-                    <img src="https://art.pixilart.com/8afb782c4601281.gif" width="75" height="75" />
+                    <img src="/images/loading.gif" width="75" height="75" />
                 }
                 else
                 {
@@ -175,7 +175,14 @@ else
         @if (!string.IsNullOrWhiteSpace(answer))
         {
             <div class="row" style="text-align:center">
-                <div class="col-sm">
+                <div class="col-3 col-sm-4" style="text-align:right; color:red">
+                    @if (@countWrong > 0 || @countCorrect > 0)
+                    {
+                        @countWrong
+                        <img src="/images/bad.png" width="25" height="25" style="vertical-align:top" />
+                    }
+                </div>
+                <div class="col-6 col-sm-4 mb-5">
                     <a type="button" class="btn btn-outline-warning" style="text-align:center" @onclick="ShowAnswer">
                         <b>
                             @if (showAnswer)
@@ -188,6 +195,13 @@ else
                             }
                         </b>
                     </a>
+                </div>
+                <div class="col-3 col-sm-4" style="text-align:left; color:green">
+                    @if (@countWrong > 0 || @countCorrect > 0)
+                    {
+                        <img src="/images/good.png" width="25" height="25" style="vertical-align:top" />
+                        @countCorrect
+                    }
                 </div>
             </div>
         }
@@ -217,6 +231,8 @@ else
     private bool showResult;
     private bool resultValue;
     private bool isGenerating;
+    private int countWrong;
+    private int countCorrect;
     private int m_selectedMode;
     private int selectedMode
     {
@@ -315,6 +331,10 @@ else
     {
         if (showResult) return;
         resultValue = (inputText?.Trim().ToLower().Replace("’", "'") ?? string.Empty) == (answer?.Trim().ToLower() ?? string.Empty);
+        if (resultValue)
+            ++countCorrect;
+        else
+            ++countWrong;
         showResult = true;
         await Task.Run(async () =>
         {
@@ -325,6 +345,13 @@ else
             //this.StateHasChanged(); // necessary in Blazor WebAssembly
         });
         await jsRuntime.InvokeVoidAsync("SetFocusToElement", inputAnswer);
+    }
+
+    private async Task Reset()
+    {
+        countWrong = 0;
+        countCorrect = 0;
+        await GenerateWord();
     }
 
     private async Task GenerateWord()

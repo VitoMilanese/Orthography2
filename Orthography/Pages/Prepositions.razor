@@ -92,22 +92,60 @@ else
     </table>
     @if (showResult)
     {
-        <div class="form-group" style="text-align:center">
-            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">@UILabels.Labels["ui_1_next"]</button>
+        <div class="form-group mt-4" style="text-align:center">
+            <div class="row" style="text-align:center">
+                <div class="col-3 col-sm-4 mt-1" style="text-align:right; color:red">
+                    @if (@countWrong > 0 || @countCorrect > 0)
+                    {
+                        @countWrong
+                        <img src="/images/bad.png" width="25" height="25" style="vertical-align:top; margin-left:3pt" />
+                    }
+                </div>
+                <div class="col-6 col-sm-4" style="text-align:center">
+                    <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">@UILabels.Labels["ui_1_next"]</button>
+                </div>
+                <div class="col-3 col-sm-4 mt-1" style="text-align:left; color:green">
+                    @if (@countWrong > 0 || @countCorrect > 0)
+                    {
+                        <img src="/images/good.png" width="25" height="25" style="vertical-align:top; margin-right:3pt" />
+                        @countCorrect
+                    }
+                </div>
+            </div>
             @if (resultValue)
             {
-                <h3 class="mt-2" style="color:green">@UILabels.Labels["ui_1_correct"]</h3>
+                <div class="mb-5">
+                    <h3 class="mt-2" style="color:green">@UILabels.Labels["ui_1_correct"]</h3>
+                </div>
             }
             else
             {
-                <h3 class="mt-2" style="color:red">@UILabels.Labels["ui_1_errors"]</h3>
+                <div class="mb-5">
+                    <h3 class="mt-2" style="color:red">@UILabels.Labels["ui_1_errors"]</h3>
+                </div>
             }
         </div>
     }
     else
     {
-        <div style="text-align:center">
-            <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILabels.Labels["ui_1_check"]</button>
+        <div class="row mt-4" style="text-align:center">
+            <div class="col-3 col-sm-4 mt-1" style="text-align:right; color:red">
+                @if (@countWrong > 0 || @countCorrect > 0)
+                {
+                    @countWrong
+                    <img src="/images/bad.png" width="25" height="25" style="vertical-align:top; margin-left:3pt" />
+                }
+            </div>
+            <div class="col-6 col-sm-4 mb-5" style="text-align:center">
+                <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILabels.Labels["ui_1_check"]</button>
+            </div>
+            <div class="col-3 col-sm-4 mt-1" style="text-align:left; color:green">
+                @if (@countWrong > 0 || @countCorrect > 0)
+                {
+                    <img src="/images/good.png" width="25" height="25" style="vertical-align:top; margin-right:3pt" />
+                    @countCorrect
+                }
+            </div>
         </div>
     }
 }
@@ -118,6 +156,8 @@ else
     private bool showResult;
     private bool resultValue;
     private bool showTranslation;
+    private int countWrong;
+    private int countCorrect;
     private const string clear = "black";
     private const string correct = "green";
     private const string wrong = "red";
@@ -181,6 +221,10 @@ else
             resultValue &= f;
             colors[i] = f ? correct : wrong;
         }
+        if (resultValue)
+            ++countCorrect;
+        else
+            ++countWrong;
         showResult = true;
     }
 
