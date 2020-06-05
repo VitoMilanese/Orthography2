@@ -10,22 +10,30 @@ else
     <div class="container mt-0 mt-sm-5">
         <div class="row">
             <div class="col-sm" />
-            <div class="col-sm" style="text-align:center">
+            <div class="col-sm" style="text-align:center; min-width: 60%">
                 <h1><b>@word.Value</b></h1>
                 @if (!string.IsNullOrWhiteSpace(@word.Translation))
                 {
-                    <a type="button" class="btn btn-outline-warning" @onclick="() => showTranslation = !showTranslation">
-                        @UILabels.Labels["ui_1_translation"]:
-                        <b>
-                            @if (showTranslation)
-                            {
-                                @word.Translation
-                            }
-                            else
-                            {
-                                @("XXXXXXXXXX")
-                            }
-                        </b>
+                    <a type="button" class="LinkButton" @onclick="() => showTranslation = !showTranslation"
+                       style="-webkit-appearance:none; -moz-appearance:none; appearance:none">
+                        <div class="LinkButton" style="border: 1px solid orange; border-radius: 5px;
+                            -webkit-touch-callout: none;
+                            -webkit-user-select: none;
+                            -khtml-user-select: none;
+                            -moz-user-select: none;
+                            -ms-user-select: none;
+                            user-select: none">
+                            <b>
+                                @if (showTranslation)
+                                {
+                                    @word.Translation
+                                }
+                                else
+                                {
+                                    @UILabels.Labels["ui_1_translation"]
+                                }
+                            </b>
+                        </div>
                     </a>
                 }
             </div>

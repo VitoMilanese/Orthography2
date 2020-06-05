@@ -1,5 +1,6 @@
 ﻿@*https://getbootstrap.com/docs/4.1/layout/grid/*@
 @page "/"
+@inject IJSRuntime jsRuntime
 
 @if (selectedWord == null)
 {
@@ -86,18 +87,35 @@ else
                 <h1><b>@selectedWord.Value</b></h1>
                 @if (!string.IsNullOrWhiteSpace(selectedWord.Translation))
                 {
-                    <a type="button" class="btn btn-outline-warning" @onclick="() => showTranslation = !showTranslation">
-                        <b>
-                            @if (showTranslation)
-                            {
-                                @selectedWord.Translation
-                            }
-                            else
-                            {
-                                @UILabels.Labels["ui_0_translation"]
-                            }
-                        </b>
-                    </a>
+                    <table width="100%">
+                        <tr>
+                            <td style="width:15%" />
+                            <td align="center">
+                                <a type="button" class="LinkButton" @onclick="TranslateClicked"
+                                   style="-webkit-appearance:none; -moz-appearance:none; appearance:none">
+                                    <div class="LinkButton" style="border: 1px solid orange; border-radius: 5px;
+                                        -webkit-touch-callout: none;
+                                        -webkit-user-select: none;
+                                        -khtml-user-select: none;
+                                        -moz-user-select: none;
+                                        -ms-user-select: none;
+                                        user-select: none">
+                                        <b>
+                                            @if (showTranslation)
+                                            {
+                                                @selectedWord.Translation
+                                            }
+                                            else
+                                            {
+                                                @UILabels.Labels["ui_0_translation"]
+                                            }
+                                        </b>
+                                    </div>
+                                </a>
+                            </td>
+                            <td style="width:15%" />
+                        </tr>
+                    </table>
                 }
             </div>
         </div>
@@ -111,21 +129,23 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt" @onclick="GenerateWord">@UILabels.Labels["ui_0_reset"]</button>
+                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="GenerateWord">@UILabels.Labels["ui_0_reset"]</button>
                 }
             </div>
             <div class="col-6" style="text-align:center">
-                <div class="form-group mb-0">
+                <div class="form-group mb-1">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="cbLockWord" @bind="lockWord" />
-                        <label for="cbLockWord" class="custom-control-label">@UILabels.Labels["ui_0_lock_word"]</label>
+                        <label for="cbLockWord" class="custom-control-label" style="font-size: 14px">
+                            @UILabels.Labels["ui_0_lock_word"]
+                        </label>
                     </div>
                 </div>
                 <div class="form-group col-12 mr-2 mt-0">
                     <input type="text" class="col-12" id="answer" placeholder="@UILabels.Labels["ui_0_answer"]"
                            style="text-align:center;min-height:30pt"
                            @bind-value="@inputText" @bind-value:event="oninput"
-                           @onkeypress="AnswerKeyPress" />
+                           @onkeypress="AnswerKeyPress" @ref="inputAnswer" />
                 </div>
                 @if (showResult)
                 {
@@ -148,7 +168,7 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-info mt-4" style="min-height: 30pt" @onclick="CheckAnswer">@UILabels.Labels["ui_0_check"]</button>
+                    <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="CheckAnswer">@UILabels.Labels["ui_0_check"]</button>
                 }
             </div>
         </div>
@@ -185,6 +205,7 @@ else
     private Word selectedWord;
     private Rule selectedRule;
     private Relation selectedRelation;
+    private ElementReference inputAnswer;
     private string quickInfo;
     private string inputText;
     private string answer;
@@ -303,6 +324,7 @@ else
                 await GenerateWord();
             //this.StateHasChanged(); // necessary in Blazor WebAssembly
         });
+        await jsRuntime.InvokeVoidAsync("SetFocusToElement", inputAnswer);
     }
 
     private async Task GenerateWord()
@@ -316,6 +338,7 @@ else
             isGenerating = false;
             //this.StateHasChanged(); // necessary in Blazor WebAssembly
         });
+        await jsRuntime.InvokeVoidAsync("SetFocusToElement", inputAnswer);
     }
 
     private void GetWord()
@@ -391,7 +414,7 @@ else
             (UILabels.Labels["ui_0_gender_any"]?.ToLower() ?? DEFAULT_ANY)
         };
         quickInfo = string.Join(" - ", new List<string>
-        {
+{
             UILabels.ModeLabels[Modes.FirstOrDefault(p => p.ID == selectedMode).ID] ?? UILabels.UnknownLabel,
             UILabels.NumberLabels[Numbers.FirstOrDefault(p => p.ID == selectedNumber).ID] ?? UILabels.UnknownLabel,
             UILabels.PersonLabels[Persons.FirstOrDefault(p => p.ID == selectedPerson).ID] ?? UILabels.UnknownLabel,
@@ -431,5 +454,11 @@ else
     private void UpdateUI(object sender, EventArgs e)
     {
         InvokeAsync(() => this.StateHasChanged());
+    }
+
+    private async Task TranslateClicked()
+    {
+        showTranslation = !showTranslation;
+        await jsRuntime.InvokeVoidAsync("SetFocusToElement", inputAnswer);
     }
 }
