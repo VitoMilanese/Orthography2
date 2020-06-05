@@ -1,0 +1,12 @@
+﻿.LinkButton {
+    color: black;
+    background-color: white;
+    opacity: 0.85;
+    transition: 0.5s;
+}
+
+.LinkButton:hover {
+    color: white;
+    background-color: orange;
+    opacity: 1;
+}
