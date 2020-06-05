@@ -125,7 +125,7 @@ else
             <div class="col-3" style="text-align:right">
                 @if (isGenerating)
                 {
-                    <img src="/images/loading.gif" width="75" height="75" />
+                    <img src="/wwwroot/images/loading.gif" width="75" height="75" />
                 }
                 else
                 {
@@ -164,7 +164,7 @@ else
             <div class="col-3" style="text-align:left">
                 @if (showResult || isGenerating)
                 {
-                    <img src="/images/loading.gif" width="75" height="75" />
+                    <img src="/wwwroot/images/loading.gif" width="75" height="75" />
                 }
                 else
                 {
@@ -179,7 +179,7 @@ else
                     @if (@countWrong > 0 || @countCorrect > 0)
                     {
                         @countWrong
-                        <img src="/images/bad.png" width="25" height="25" style="vertical-align:top" />
+                        <img src="/wwwroot/images/bad.png" width="25" height="25" style="vertical-align:top" />
                     }
                 </div>
                 <div class="col-6 col-sm-4 mb-5">
@@ -199,7 +199,7 @@ else
                 <div class="col-3 col-sm-4" style="text-align:left; color:green">
                     @if (@countWrong > 0 || @countCorrect > 0)
                     {
-                        <img src="/images/good.png" width="25" height="25" style="vertical-align:top" />
+                        <img src="/wwwroot/images/good.png" width="25" height="25" style="vertical-align:top" />
                         @countCorrect
                     }
                 </div>
