@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayerTest", "DataLayerT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orthography", "Orthography\Orthography.csproj", "{3DBF532F-9D2F-4D8D-B269-CF38A5E38A4C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrthographyWebAPI", "OrthographyWebAPI\OrthographyWebAPI.csproj", "{35F889DA-69D8-467F-88AC-FBF973A6814E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{3DBF532F-9D2F-4D8D-B269-CF38A5E38A4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DBF532F-9D2F-4D8D-B269-CF38A5E38A4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DBF532F-9D2F-4D8D-B269-CF38A5E38A4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35F889DA-69D8-467F-88AC-FBF973A6814E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35F889DA-69D8-467F-88AC-FBF973A6814E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35F889DA-69D8-467F-88AC-FBF973A6814E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35F889DA-69D8-467F-88AC-FBF973A6814E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
