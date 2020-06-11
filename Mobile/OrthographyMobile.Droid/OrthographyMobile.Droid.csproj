@@ -32,10 +32,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <MandroidExtraArgs></MandroidExtraArgs>
+    <MandroidExtraArgs>
+    </MandroidExtraArgs>
     <AndroidDexTool>d8</AndroidDexTool>
     <AndroidDexTool>d8</AndroidDexTool>
-    <MandroidExtraArgs></MandroidExtraArgs>
+    <MandroidExtraArgs>
+    </MandroidExtraArgs>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,7 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.7.0.848-pre3" />
+    <PackageReference Include="Xamarin.Forms" Version="4.7.0.937-pre4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
   </ItemGroup>
