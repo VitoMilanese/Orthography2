@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 mc:Ignorable="d"
+			 BackgroundColor="{StaticResource NavigationPrimary}"
+			 x:Class="OrthographyMobile.Views.ConjunctionsPage"
+             Title="Conjunctions">
+
+	<ContentPage.Content>
+		<ScrollView>
+			<Grid HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="0.25*" />
+					<ColumnDefinition Width="0.25*" />
+					<ColumnDefinition Width="0.25*" />
+					<ColumnDefinition Width="0.25*" />
+				</Grid.ColumnDefinitions>
+
+				<!-- MODE -->
+				<Frame Grid.Row="1" Grid.Column="0" Margin="5" BorderColor="{StaticResource MainFontColor}"
+					x:Name="frame1" Grid.ColumnSpan="2"
+					MinimumHeightRequest="55" HeightRequest="55"
+					HorizontalOptions="Fill" BackgroundColor="Transparent">
+					<StackLayout>
+						<Label Text="Mode:" HorizontalTextAlignment="Center"
+							TextColor="{StaticResource TitleFontColor}" FontSize="Micro"/>
+						<Picker x:Name="cbModes" Title="Mode"
+							BackgroundColor="{d:StaticResource PickerColor}"
+							TextColor="{StaticResource PickerFontColor}"
+							TitleColor="{StaticResource PickerTitleColor}"
+							HorizontalOptions="Fill" SelectedItem="{Binding Selected.Mode}"
+							ItemsSource="{Binding Modes}"
+							Unfocused="cbModes_Unfocused"
+							SelectedIndexChanged="cbModes_SelectedIndexChanged" />
+					</StackLayout>
+				</Frame>
+
+				<!-- RANDOM -->
+				<Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+					Text="Random" TextColor="{StaticResource MainFontColor}"
+					VerticalOptions="End" HorizontalOptions="Start"
+					Margin="{Binding UI.LblRandomMargins}" d:Margin="35,0,0,7"/>
+				<StackLayout Orientation="Horizontal"
+					Margin="{Binding UI.BtnRandomMargins}" d:Margin="5,0,0,-4"
+					Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+					VerticalOptions="EndAndExpand" HorizontalOptions="Start">
+						<CheckBox x:Name="cbRandom" HorizontalOptions="Start"
+							VerticalOptions="Center" Margin="0,0,-20,0"
+							IsChecked="{Binding RandomMode}" Scale="0.6"
+							CheckedChanged="cbRandom_CheckedChanged"/>
+						<Button FontSize="Small" VerticalOptions="Center"
+							Clicked="Random_Clicked" BackgroundColor="Transparent"
+							HeightRequest="15" WidthRequest="75" />
+				</StackLayout>
+
+				<!-- GENDER -->
+				<Frame Grid.Row="1" Grid.Column="2" Margin="5" BorderColor="{StaticResource MainFontColor}"
+					x:Name="frame2" Grid.ColumnSpan="2"
+					HorizontalOptions="Fill" BackgroundColor="Transparent">
+					<StackLayout>
+						<Label Text="Gender:" HorizontalTextAlignment="Center"
+							TextColor="{StaticResource TitleFontColor}" FontSize="Micro"/>
+						<Picker x:Name="cbGenders" Title="Gender"
+							BackgroundColor="{d:StaticResource PickerColor}"
+							TextColor="{StaticResource PickerFontColor}"
+							TitleColor="{StaticResource PickerTitleColor}"
+							HorizontalOptions="Fill"
+							SelectedItem="{Binding Selected.Gender}"
+							ItemsSource="{Binding Genders}"
+							Unfocused="cbGenders_Unfocused"
+							SelectedIndexChanged="cbGenders_SelectedIndexChanged" />
+					</StackLayout>
+				</Frame>
+
+				<!-- NUMBER -->
+				<Frame Grid.Row="2" Grid.Column="0" Margin="5" BorderColor="{StaticResource MainFontColor}"
+					x:Name="frame3" Grid.ColumnSpan="2"
+					HorizontalOptions="Fill" BackgroundColor="Transparent">
+					<StackLayout>
+						<Label Text="Number:" HorizontalTextAlignment="Center"
+							TextColor="{StaticResource TitleFontColor}" FontSize="Micro"/>
+						<Picker x:Name="cbNumbers" Title="Number"
+							BackgroundColor="{d:StaticResource PickerColor}"
+							TextColor="{StaticResource PickerFontColor}"
+							TitleColor="{StaticResource PickerTitleColor}"
+							HorizontalOptions="Fill"
+							SelectedItem="{Binding Selected.Number}"
+							ItemsSource="{Binding Numbers}"
+							Unfocused="cbNumbers_Unfocused"
+							SelectedIndexChanged="cbNumbers_SelectedIndexChanged" />
+					</StackLayout>
+				</Frame>
+
+				<!-- PERSON -->
+				<Frame Grid.Row="2" Grid.Column="2" Margin="5" BorderColor="{StaticResource MainFontColor}"
+					x:Name="frame4" Grid.ColumnSpan="2"
+					HorizontalOptions="Fill" BackgroundColor="Transparent">
+					<StackLayout>
+						<Label Text="Person:" HorizontalTextAlignment="Center"
+							TextColor="{StaticResource TitleFontColor}" FontSize="Micro"/>
+						<Picker x:Name="cbPersons" Title="Person"
+							BackgroundColor="{d:StaticResource PickerColor}"
+							TextColor="{StaticResource PickerFontColor}"
+							TitleColor="{StaticResource PickerTitleColor}"
+							HorizontalOptions="Fill"
+							SelectedItem="{Binding Selected.Person}"
+							ItemsSource="{Binding Persons}"
+							Unfocused="cbPersons_Unfocused"
+							SelectedIndexChanged="cbPersons_SelectedIndexChanged" />
+						</StackLayout>
+				</Frame>
+
+				<Grid Grid.Row="3" Grid.ColumnSpan="4"
+					VerticalOptions="Fill">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*" />
+							<RowDefinition Height="2*" />
+							<RowDefinition Height="Auto" />
+						</Grid.RowDefinitions>
+
+					<!-- TRANSLATION -->
+					<Grid Grid.Row="0" Margin="0,0,0,-10" VerticalOptions="EndAndExpand">
+						<Label Grid.Row="0" TextColor="DarkOrange" Text="{Binding Selected.Word.Translation}"
+							HorizontalTextAlignment="Center" x:Name="lblTranslation"
+							HorizontalOptions="CenterAndExpand" VerticalOptions="Center" IsVisible="false" />
+						<Label x:Name="lblBtnTranslation"
+							Text="Translation" TextColor="DarkOrange" TextDecorations="Underline"
+							HorizontalTextAlignment="Center" VerticalOptions="Center" />
+						<Button Grid.Row="0" FontSize="Large" BackgroundColor="Transparent"
+							x:Name="btnTranslate" Clicked="Translate_Clicked" />
+					</Grid>
+
+					<StackLayout Grid.Row="1" VerticalOptions="StartAndExpand">
+						<!-- WORD -->
+						<Label Text="{Binding Selected.Word.Value}" d:Text="no text"
+							TextColor="{StaticResource MainFontColor}"
+							HorizontalOptions="Center" HorizontalTextAlignment="Center"
+							VerticalOptions="Start" FontSize="Title" FontAttributes="Bold" />
+
+						<!-- ANSWER INPUT -->
+						<StackLayout Margin="10,15" BackgroundColor="Transparent">
+							<Entry Placeholder="Answer" HorizontalTextAlignment="Center"
+								BackgroundColor="White" TextColor="{StaticResource MainFontColor}"
+								x:Name="inputAnswer" ReturnCommand="{Binding AnswerSubmitCommand}" />
+							<Label Text="Correct" IsVisible="false" x:Name="lblResult"
+								TextColor="{StaticResource MainFontColor}"
+								HorizontalOptions="Center" HorizontalTextAlignment="Center"
+								VerticalOptions="Start" FontSize="Title" FontAttributes="Bold" />
+						</StackLayout>
+					</StackLayout>
+
+					<Grid Grid.Row="2" Margin="10,25,10,10" VerticalOptions="EndAndExpand">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1.5*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- RESET -->
+						<Button Grid.Column="0" Text="Reset" FontSize="Large"
+							BorderColor="PaleVioletRed" BorderWidth="1"
+							BackgroundColor="Transparent" TextColor="PaleVioletRed"
+							x:Name="btnReset" Clicked="Reset_Clicked"/>
+						<!-- ANSWER BUTTON -->
+						<Label Grid.Column="0" Grid.ColumnSpan="3"
+							Text="{Binding Selected.Relation.Result}"
+							VerticalOptions="Fill" VerticalTextAlignment="Center"
+							HorizontalOptions="Fill" HorizontalTextAlignment="Center"
+							TextColor="LightSkyBlue" TextDecorations="Underline"
+							IsVisible="false" x:Name="lblAnswer" />
+						<Label Grid.Column="1" Text="Answer"
+							VerticalOptions="Fill" VerticalTextAlignment="Center"
+							HorizontalTextAlignment="Center" TextColor="LightSkyBlue"
+							TextDecorations="Underline"
+							x:Name="lblBtnAnswer" />
+						<Button Grid.Column="1"
+							BackgroundColor="Transparent"
+							x:Name="btnAnswer" Clicked="ShowAnswer_Clicked" />
+						<!-- CHECK -->
+						<Button Grid.Column="2" Text="Check" FontSize="Large"
+							BorderColor="LimeGreen" BorderWidth="1"
+							BackgroundColor="Transparent" TextColor="LimeGreen"
+							x:Name="btnCheck" Clicked="Check_Clicked" />
+					</Grid>
+				</Grid>
+
+				<!-- LOADING -->
+				<ActivityIndicator Grid.Row="0" Grid.RowSpan="4"
+					   Grid.Column="0" Grid.ColumnSpan="4"
+					   BackgroundColor="#66000000" Scale="5"
+					   IsVisible="{Binding BusyIndicator}"
+					   IsEnabled="{Binding BusyIndicator}"
+					   IsRunning="{Binding BusyIndicator}" />
+			</Grid>
+		</ScrollView>
+	</ContentPage.Content>
+
+</ContentPage>

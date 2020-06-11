@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 mc:Ignorable="d"
+			 BackgroundColor="{StaticResource NavigationPrimary}"
+			 x:Class="OrthographyMobile.Views.PrepositionsPage"
+             Title="Prepositions">
+
+	<ContentPage.Content>
+		<ScrollView>
+			<Grid HorizontalOptions="Fill" VerticalOptions="FillAndExpand" BackgroundColor="Transparent">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="1*" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="1.5*" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+
+				<!-- TRANSLATION -->
+				<Grid Grid.Row="0" Margin="0,0,0,-10" VerticalOptions="EndAndExpand">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<Label Grid.Row="0" TextColor="DarkOrange" Text="{Binding Selected.Translation}"
+						HorizontalTextAlignment="Center" x:Name="lblTranslation"
+						HorizontalOptions="CenterAndExpand" VerticalOptions="Center" IsVisible="false" />
+					<Label x:Name="lblBtnTranslation"
+						Text="Translation" TextColor="DarkOrange" TextDecorations="Underline"
+						HorizontalTextAlignment="Center" VerticalOptions="Center" />
+					<Button Grid.Row="0" FontSize="Large" BackgroundColor="Transparent"
+						x:Name="btnTranslate" Clicked="Translate_Clicked" />
+				</Grid>
+
+				<!-- WORD -->
+				<Label Grid.Row="1" VerticalOptions="StartAndExpand"
+					Text="{Binding Selected.Value}" Margin="0,30"
+					TextColor="{StaticResource MainFontColor}"
+					HorizontalOptions="Center" HorizontalTextAlignment="Center"
+					FontSize="Title" FontAttributes="Bold" />
+
+				<!-- BUTTONS TABLE -->
+				<Grid Grid.Row="2" VerticalOptions="StartAndExpand" Margin="10,0">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+					
+					<Button  Grid.Row="0" Grid.Column="0" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="qqch"
+						x:Name="btn_0"/>
+					<Button  Grid.Row="1" Grid.Column="0" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="à qqch"
+						x:Name="btn_1"/>
+					<Button  Grid.Row="2" Grid.Column="0" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="de qqch"
+						x:Name="btn_2"/>
+					
+					<Button  Grid.Row="0" Grid.Column="1" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="qqn"
+						x:Name="btn_3"/>
+					<Button  Grid.Row="1" Grid.Column="1" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="à qqn"
+						x:Name="btn_4"/>
+					<Button  Grid.Row="2" Grid.Column="1" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="de qqn"
+						x:Name="btn_5"/>
+					
+					<Button  Grid.Row="0" Grid.Column="2" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="faire"
+						x:Name="btn_6"/>
+					<Button  Grid.Row="1" Grid.Column="2" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="à faire"
+						x:Name="btn_7"/>
+					<Button  Grid.Row="2" Grid.Column="2" TextColor="White"
+						BorderColor="White" BorderWidth="1"
+						HorizontalOptions="FillAndExpand" Text="de faire"
+						x:Name="btn_8"/>
+				</Grid>
+
+				<Grid Grid.Row="3" Margin="10,25,10,10" VerticalOptions="EndAndExpand">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="1*"/>
+							<ColumnDefinition Width="1.5*"/>
+							<ColumnDefinition Width="1*"/>
+						</Grid.ColumnDefinitions>
+
+						<!-- RESET -->
+						<Button Grid.Column="0" Text="Reset" FontSize="Large"
+							BorderColor="PaleVioletRed" BorderWidth="1"
+							BackgroundColor="Transparent" TextColor="PaleVioletRed"
+							x:Name="btnReset" Clicked="Reset_Clicked"/>
+						<!-- Next -->
+						<Button Grid.Column="0" Grid.ColumnSpan="3"
+							Text="Next" FontSize="Large" IsVisible="false"
+							BorderColor="LimeGreen" BorderWidth="1"
+							BackgroundColor="Transparent" TextColor="LimeGreen"
+							x:Name="btnNext" Clicked="Next_Clicked" />
+						<!-- CHECK -->
+						<Button Grid.Column="2" Text="Check" FontSize="Large"
+							BorderColor="LimeGreen" BorderWidth="1"
+							BackgroundColor="Transparent" TextColor="LimeGreen"
+							x:Name="btnCheck" Clicked="Check_Clicked" />
+					</Grid>
+				
+				<!-- LOADING -->
+				<ActivityIndicator Grid.Row="0" Grid.RowSpan="3"
+					   BackgroundColor="#66000000" Scale="5"
+					   IsVisible="{Binding BusyIndicator}"
+					   IsEnabled="{Binding BusyIndicator}"
+					   IsRunning="{Binding BusyIndicator}" />
+			</Grid>
+		</ScrollView>
+	</ContentPage.Content>
+</ContentPage>
