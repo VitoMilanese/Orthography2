@@ -1,0 +1,222 @@
+﻿@page "/generator"
+
+<textarea class="form-group col-12 mt-1" style="resize:none" rows="10" @bind="@input" />
+<center>
+    <button type="button" class="btn btn-success mt-1" style="min-height: 30pt; min-width: 100px" @onclick="Save">Save</button>
+</center>
+<table style="text-align:center; margin-top:15px" align="center">
+    <tr style="background-color: lightgray">
+        <td style="border: 1px solid black" rowspan="2">
+            <div style="margin:2px 5px; vertical-align:central">
+                <b>Infinitive</b>
+            </div>
+        </td>
+        <td style="border: 1px solid black" colspan="6">
+            <div style="margin:2px 5px">
+                <b>Present</b>
+            </div>
+        </td>
+        <td style="border: 1px solid black" colspan="6">
+            <div style="margin:2px 5px">
+                <b>Imperfect</b>
+            </div>
+        </td>
+        <td style="border: 1px solid black" colspan="6">
+            <div style="margin:2px 5px">
+                <b>Future</b>
+            </div>
+        </td>
+        <td style="border: 1px solid black" colspan="3">
+            <div style="margin:2px 5px">
+                <b>Imperative</b>
+            </div>
+        </td>
+    </tr>
+    <tr style="background-color: lightgray">
+        @foreach (var column in headers)
+        {
+            <td style="border: 1px solid black">
+                <div style="margin:2px 5px">
+                    <b>@column</b>
+                </div>
+            </td>
+        }
+    </tr>
+    @foreach (var row in output)
+    {
+        <tr>
+            @foreach (var column in row)
+            {
+                <td style="border: 1px solid black">
+                    <div style="margin:2px 5px">
+                        @column
+                    </div>
+                </td>
+            }
+        </tr>
+    }
+</table>
+<table style="text-align:center; margin-top:15px" align="center">
+    @foreach (var row in problems)
+    {
+        <tr>
+            <td style="border: 1px solid black">
+                <div style="margin:2px 5px; color:red">
+                    @row
+                </div>
+            </td>
+        </tr>
+    }
+</table>
+
+@code {
+    private string input;
+    private List<string[]> output;
+    private List<string> problems;
+    private string[] headers;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        output = new List<string[]>();
+        problems = new List<string>();
+        headers = new[]
+        {
+            "1singular", "2singular", "3singular", "1plural", "2plural", "3plural",
+            "1singular", "2singular", "3singular", "1plural", "2plural", "3plural",
+            "1singular", "2singular", "3singular", "1plural", "2plural", "3plural",
+            "2singular", "1plural", "2plural"
+        };
+    }
+
+    private void Save()
+    {
+        output.Clear();
+        problems.Clear();
+        if (string.IsNullOrWhiteSpace(input)) return;
+        var lines = input.Replace("’", "'").Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
+        var blocks = new[] { ConjugBloc.Present, ConjugBloc.Imperfect, ConjugBloc.Future, ConjugBloc.Imperative };
+        var noFilter = new[] { ConjugBloc.Imperative };
+
+        foreach (var line in lines)
+        {
+            var word = line.ToLower().Trim();
+            if (string.IsNullOrEmpty(word)) continue;
+            var row = output.Count;
+            var newRow = new string[22];
+
+            var urlAddress = $"https://leconjugueur.lefigaro.fr/php5/index.php?l=uk&verbe={word}";
+
+            var request = (HttpWebRequest)WebRequest.Create(urlAddress);
+            var response = (HttpWebResponse)request.GetResponse();
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var receiveStream = response.GetResponseStream();
+                StreamReader readStream = null;
+
+                if (string.IsNullOrWhiteSpace(response.CharacterSet))
+                    readStream = new StreamReader(receiveStream);
+                else
+                    readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet));
+
+                var data = readStream.ReadToEnd();
+
+                try
+                {
+                    newRow[0] = GetImperfect(data);
+                    if (string.IsNullOrEmpty(newRow[0]))
+                        throw new Exception();
+
+                    var id = 1;
+                    var error = false;
+                    foreach (var b in blocks)
+                    {
+                        var block = GetConjugBloc(data, b);
+                        if (string.IsNullOrEmpty(data))
+                        {
+                            error = true;
+                            break;
+                        }
+                        var start = id;
+                        var end = start + block.Length;
+                        for (var i = 0; i < block.Length; ++i, ++id)
+                            newRow[id] = block[i];
+                        if (!noFilter.Contains(b))
+                            Filter(newRow, start, end);
+                    }
+                    if (error) throw new Exception();
+
+                    output.Add(newRow);
+                }
+                catch (Exception)
+                {
+                    problems.Add(word);
+                }
+                finally
+                {
+                    response.Close();
+                    readStream.Close();
+                }
+            }
+        }
+    }
+
+    //temps#
+    private enum ConjugBloc
+    {
+        Present = 0,
+        Imperfect = 6,
+        Future = 18,
+        Imperative = 42,
+        Participle = 225
+    }
+
+    private static string GetImperfect(string data)
+    {
+        const string StartTag = "<h1>French verb conjugation for  <b>";
+        const string EndTag = "</b>";
+        var start = data.IndexOf(StartTag);
+        if (start < 0) return null;
+        start += StartTag.Length;
+        var end = data.IndexOf(EndTag, start);
+        var imperfect = data.Substring(start, end - start).Trim().ToLower();
+        return Replace(imperfect);
+    }
+
+    private static string[] GetConjugBloc(string data, ConjugBloc code)
+    {
+        const string StartTag = "<p>";
+        const string EndTag = "</p>";
+        var ControlText = $"<div class=\"conjugBloc\"><div id=\"temps{(int)code}\"";
+        var start = data.IndexOf(ControlText);
+        if (start < 0) return null;
+        start = data.IndexOf(StartTag, start) + StartTag.Length;
+        start = data.IndexOf(StartTag, start) + StartTag.Length;
+        var end = data.IndexOf(EndTag, start);
+        var block = Replace(data.ToLower().Substring(start, end - start).Trim().ToLower()
+            .Replace("<b>", string.Empty).Replace("</b>", string.Empty).Replace("<br />", "|"));
+        return block.Split("|");
+    }
+
+    private static string Replace(string data)
+    {
+        return data
+            .Replace("&aacute;", "á").Replace("&acirc;", "â").Replace("&agrave;", "à")
+            .Replace("&eacute;", "é").Replace("&ecirc;", "ê").Replace("&egrave;", "è")
+            .Replace("&iacute;", "í").Replace("&icirc;", "î").Replace("&igrave;", "ì")
+            .Replace("&oacute;", "ó").Replace("&ocirc;", "ô").Replace("&ograve;", "ò")
+            .Replace("&uacute;", "ú").Replace("&ucirc;", "û").Replace("&ugrave;", "ù")
+            .Replace("&ccedil;", "ç");
+    }
+
+    private static void Filter(string[] data, int start, int end)
+    {
+        if (data.Length == 0) return;
+        var n = new[] { 0, 3, 3, 5, 5, 4 };
+        n[0] = data[0].IndexOf("je ") == 0 ? 3 : 2; // "je " or "j'"
+        var size = end - start;
+        for (var i = 0; i < size && i < 6; ++i)
+            data[start + i] = data[start + i].Substring(n[i], data[start + i].Length - n[i]);
+    }
+}
