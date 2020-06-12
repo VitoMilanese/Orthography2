@@ -31,55 +31,62 @@ namespace Orthography.Shared
 			NumberLabels = new Dictionary<int, string>();
 			PersonLabels = new Dictionary<int, string>();
 			GenderLabels = new Dictionary<int, string>();
-			
-			id_languageName = Db.Context.Labels.FirstOrDefault(p => p.Value == "ui_language_name")?.ID ?? Default_ID_Language_Name;
-			id_unknownLabel = Db.Context.Labels.FirstOrDefault(p => p.Value == "unknown_label")?.ID ?? Default_ID_Unknown_Label;
 
-			if (Db.Context.Languages.Count() > 0)
-				SelectLanguage(Db.Context.Languages.FirstOrDefault(p => p.ID == Default_Language) ?? Db.Context.Languages.FirstOrDefault());
+			using (var db = new Db())
+			{
+				id_languageName = db.Labels.FirstOrDefault(p => p.Value == "ui_language_name")?.ID ?? Default_ID_Language_Name;
+				id_unknownLabel = db.Labels.FirstOrDefault(p => p.Value == "unknown_label")?.ID ?? Default_ID_Unknown_Label;
+
+				if (db.Languages.Count() > 0)
+					SelectLanguage(db.Languages.FirstOrDefault(p => p.ID == Default_Language) ?? db.Languages.FirstOrDefault());
+			}
 		}
 
 		public static bool SelectLanguage(int id)
 		{
-			var language = Db.Context.Languages.FirstOrDefault(p => p.ID == id);
-			if (language == null) return false;
-			return SelectLanguage(language);
+			using (var db = new Db())
+			{
+				var language = db.Languages.FirstOrDefault(p => p.ID == id);
+				if (language == null) return false;
+				return SelectLanguage(language);
+			}
 		}
 
 		public static bool SelectLanguage(Language language)
 		{
-			try
-			{
-				var languageName = Db.Context.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_languageName);
+			using (var db = new Db())
+				try
+				{
+				var languageName = db.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_languageName);
 				CurrentLanguage = new Language
 				{
 					ID = language.ID,
 					LanguageNameID = languageName?.ID ?? Default_ID_Language_Name,
 					Label = languageName.Value ?? UnknownLabel
 				};
-				UnknownLabel = Db.Context.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_unknownLabel)?.Value ?? "unknown_label";
+				UnknownLabel = db.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_unknownLabel)?.Value ?? "unknown_label";
 				Labels.Clear();
-				var terms = Db.Context.Terms.ToDictionary(p => p.ID, p => p.Value);
-				foreach (var label in Db.Context.Labels.Where(p => p.LanguageID == language.ID))
+				var terms = db.Terms.ToDictionary(p => p.ID, p => p.Value);
+				foreach (var label in db.Labels.Where(p => p.LanguageID == language.ID))
 				{
 					var term = terms.FirstOrDefault(p => p.Key == label.TermID).Value;
 					if (!Labels.ContainsKey(term))
 						Labels.Add(term, label.Value);
 				}
 				ModeLabels.Clear();
-				foreach (var mode in Db.Context.Modes)
+				foreach (var mode in db.Modes)
 					if (!ModeLabels.ContainsKey(mode.ID))
 						ModeLabels.Add(mode.ID, Labels[terms[mode.LabelID]]);
 				NumberLabels.Clear();
-				foreach (var number in Db.Context.Numbers)
+				foreach (var number in db.Numbers)
 					if (!NumberLabels.ContainsKey(number.ID))
 						NumberLabels.Add(number.ID, Labels[terms[number.LabelID]]);
 				PersonLabels.Clear();
-				foreach (var person in Db.Context.Persons)
+				foreach (var person in db.Persons)
 					if (!PersonLabels.ContainsKey(person.ID))
 						PersonLabels.Add(person.ID, Labels[terms[person.LabelID]]);
 				GenderLabels.Clear();
-				foreach (var gender in Db.Context.Genders)
+				foreach (var gender in db.Genders)
 					if (!GenderLabels.ContainsKey(gender.ID))
 						GenderLabels.Add(gender.ID, Labels[terms[gender.LabelID]]);
 			}

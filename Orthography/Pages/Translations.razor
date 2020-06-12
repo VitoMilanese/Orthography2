@@ -27,19 +27,22 @@
         var words = inputWords.Replace("’", "'").ToLower().Split('\n').Select(p => p.Trim()).ToArray();
         var translations = inputTranslations.Replace("’", "'").ToLower().Split('\n').Select(p => p.Trim()).ToArray();
         var end = Math.Min(words.Length, translations.Length);
-        for (var i = 0; i < end; ++i)
+        using (var db = new Db())
         {
-            if (string.IsNullOrEmpty(words[i])) continue;
-            var existingWord = Db.Context.Words.FirstOrDefault(p => p.Value.ToLower().Trim().Replace("’", "'") == words[i]);
-            if (existingWord != null)
-                existingWord.Translation = translations[i];
-            else
-                Db.Context.Words.Add(new Word
-                {
-                    Value = words[i],
-                    Translation = translations[i]
-                });
+            for (var i = 0; i < end; ++i)
+            {
+                if (string.IsNullOrEmpty(words[i])) continue;
+                var existingWord = db.Words.FirstOrDefault(p => p.Value.ToLower().Trim().Replace("’", "'") == words[i]);
+                if (existingWord != null)
+                    existingWord.Translation = translations[i];
+                else
+                    db.Words.Add(new Word
+                    {
+                        Value = words[i],
+                        Translation = translations[i]
+                    });
+            }
+            db.Save();
         }
-        Db.Save();
     }
 }

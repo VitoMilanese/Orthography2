@@ -55,16 +55,19 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        Languages = Db.Context.Languages.ToList();
-        // alternative method
-        //var id_language_term = Db.Context.Terms.FirstOrDefault(p => p.Value == "ui_language")?.ID ?? -1;
-        foreach (var language in Languages)
+        using (var db = new Db())
         {
-            language.Label = Db.Context.Labels.FirstOrDefault(p => p.ID == language.LanguageNameID)?.Value ?? UILabels.UnknownLabel;
+            Languages = db.Languages.ToList();
             // alternative method
-            //language.Label = id_language_term == -1
-            //    ? UILabels.UnknownLabel
-            //    : Db.Context.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_language_term)?.Value ?? UILabels.UnknownLabel;
+            //var id_language_term = db.Terms.FirstOrDefault(p => p.Value == "ui_language")?.ID ?? -1;
+            foreach (var language in Languages)
+            {
+                language.Label = db.Labels.FirstOrDefault(p => p.ID == language.LanguageNameID)?.Value ?? UILabels.UnknownLabel;
+                // alternative method
+                //language.Label = id_language_term == -1
+                //    ? UILabels.UnknownLabel
+                //    : db.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_language_term)?.Value ?? UILabels.UnknownLabel;
+            }
         }
         Languages = Languages.OrderBy(p => p.Label).ToList();
         selectedLanguage = UILabels.CurrentLanguage.ID;

@@ -209,27 +209,29 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
-        Modes = Db.Context.Modes.ToList();
-        if (Modes.Count > 0)
-            selectedMode = Modes[0].ID;
-
-        var persons = Db.Context.Persons.Where(p => p.ID > 1).Select(p => p.ID).ToArray();
-        var numbers = Db.Context.Numbers.Where(p => p.ID > 1).Select(p => p.ID).ToArray();
-        var genders = Db.Context.Genders.Select(p => p.ID).ToArray();
-
-        if (persons.Length < 3) throw new Exception("Must be 3 persons");
-        if (numbers.Length < 2) throw new Exception("Must be 2 numbers");
-        if (genders.Length < 2) throw new Exception("Must be 3 genders");
-
-        for (var i = 0; i < cbRules.Length; ++i)
+        using (var db = new Db())
         {
-            cbRules[i] = new Rule
+            Modes = db.Modes.ToList();
+            if (Modes.Count > 0)
+                selectedMode = Modes[0].ID;
+
+            var persons = db.Persons.Where(p => p.ID > 1).Select(p => p.ID).ToArray();
+            var numbers = db.Numbers.Where(p => p.ID > 1).Select(p => p.ID).ToArray();
+            var genders = db.Genders.Select(p => p.ID).ToArray();
+
+            if (persons.Length < 3) throw new Exception("Must be 3 persons");
+            if (numbers.Length < 2) throw new Exception("Must be 2 numbers");
+            if (genders.Length < 2) throw new Exception("Must be 3 genders");
+
+            for (var i = 0; i < cbRules.Length; ++i)
             {
-                PersonID = persons[i % 3],
-                NumberID = numbers[(i % 6) / 3],
-                GenderID = genders[i / 6]
-            };
+                cbRules[i] = new Rule
+                {
+                    PersonID = persons[i % 3],
+                    NumberID = numbers[(i % 6) / 3],
+                    GenderID = genders[i / 6]
+                };
+            }
         }
 
         genderAny = true;
@@ -241,92 +243,100 @@
         var lines = input.Replace("’", "'").Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
         var empty = fillEmpty ? "-" : string.Empty;
 
-        var tmpRules = new List<Rule>();
-        tmpRules.AddRange(Db.Context.Rules);
-        var tmpWords = new List<Word>();
-        tmpWords.AddRange(Db.Context.Words);
-        var tmpRelations = new List<Relation>();
-        tmpRelations.AddRange(Db.Context.Relations);
-
-        foreach (var line in lines)
+        using (var db = new Db())
         {
-            var cols = line.Split('\t').Select(p => p.ToLower().Trim()).Select(p => string.IsNullOrWhiteSpace(p) ? string.Empty : p).ToList();
-            var hasEmpty = cols.Contains(string.Empty);
-            if (hasEmpty && !allowEmpty) continue;
-            if (hasEmpty && fillEmpty)
-                for (var i = 0; i < cols.Count; ++i)
-                    if (string.IsNullOrWhiteSpace(cols[i])) cols[i] = empty;
+            var tmpRules = new List<Rule>();
+            tmpRules.AddRange(db.Rules);
+            var tmpWords = new List<Word>();
+            tmpWords.AddRange(db.Words);
+            var tmpRelations = new List<Relation>();
+            tmpRelations.AddRange(db.Relations);
 
-            var rules = new List<Rule>();
-            for (var i = 0; i < cbRules.Length; ++i)
+            using (var dbWords = new Db())
             {
-                cbRules[i].ID = 0;
-                cbRules[i].ModeID = cbStates[i] ? selectedMode : 0;
-            }
-            foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
-            {
-                var existingRule = tmpRules.FirstOrDefault(p =>
-                    p.ModeID == rule.ModeID &&
-                    p.PersonID == rule.PersonID &&
-                    p.NumberID == rule.NumberID &&
-                    p.GenderID == rule.GenderID);
-                if (existingRule == null)
+                foreach (var line in lines)
                 {
-                    var newRule = new Rule
+                    var cols = line.Split('\t').Select(p => p.ToLower().Trim()).Select(p => string.IsNullOrWhiteSpace(p) ? string.Empty : p).ToList();
+                    var hasEmpty = cols.Contains(string.Empty);
+                    if (hasEmpty && !allowEmpty) continue;
+                    if (hasEmpty && fillEmpty)
+                        for (var i = 0; i < cols.Count; ++i)
+                            if (string.IsNullOrWhiteSpace(cols[i])) cols[i] = empty;
+
+                    var rules = new List<Rule>();
+                    for (var i = 0; i < cbRules.Length; ++i)
                     {
-                        ModeID = selectedMode,
-                        PersonID = rule.PersonID,
-                        NumberID = rule.NumberID,
-                        GenderID = rule.GenderID
-                    };
-                    tmpRules.Add(newRule);
-                    Db.Context.Rules.Add(newRule);
+                        cbRules[i].ID = 0;
+                        cbRules[i].ModeID = cbStates[i] ? selectedMode : 0;
+                    }
+                    foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
+                    {
+                        var existingRule = tmpRules.FirstOrDefault(p =>
+                            p.ModeID == rule.ModeID &&
+                            p.PersonID == rule.PersonID &&
+                            p.NumberID == rule.NumberID &&
+                            p.GenderID == rule.GenderID);
+                        if (existingRule == null)
+                        {
+                            var newRule = new Rule
+                            {
+                                ModeID = selectedMode,
+                                PersonID = rule.PersonID,
+                                NumberID = rule.NumberID,
+                                GenderID = rule.GenderID
+                            };
+                            tmpRules.Add(newRule);
+                            db.Rules.Add(newRule);
+                        }
+                    }
+                    foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
+                    {
+                        rule.ID = tmpRules.FirstOrDefault(p =>
+                            p.ModeID == rule.ModeID &&
+                            p.PersonID == rule.PersonID &&
+                            p.NumberID == rule.NumberID &&
+                            p.GenderID == rule.GenderID)
+                            .ID;
+                    }
+
+                    var word = cols[0];
+                    var existingWord = tmpWords.FirstOrDefault(p => p.Value.ToLower().Trim().Replace("’", "'") == word);
+                    if (existingWord == null)
+                    {
+                        existingWord = new Word
+                        {
+                            Value = word
+                        };
+                        tmpWords.Add(existingWord);
+                        dbWords.Words.Add(existingWord);
+                        dbWords.SaveChanges();
+                        existingWord = dbWords.Words.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
+                        //existingWord = tmpWords.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
+                    }
+
+                    var colId = 1;
+                    for (var i = 0; i < cbRules.Length; ++i)
+                    {
+                        if (cbRules[i].ModeID == 0) continue;
+                        var existingRelation = tmpRelations.FirstOrDefault(p => p.RuleID == cbRules[i].ID && p.WordID == existingWord.ID);
+                        if (existingRelation == null)
+                        {
+                            var newRelation = new Relation
+                            {
+                                WordID = existingWord.ID,
+                                RuleID = cbRules[i].ID,
+                                Result = colId < cols.Count ? cols[colId] : empty
+                            };
+                            tmpRelations.Add(newRelation);
+                            db.Relations.Add(newRelation);
+                        }
+                        else
+                            existingRelation.Result = colId < cols.Count ? cols[colId] : empty;
+                        ++colId;
+                    }
                 }
             }
-            foreach (var rule in cbRules.Where(p => p.ModeID == selectedMode))
-            {
-                rule.ID = tmpRules.FirstOrDefault(p =>
-                    p.ModeID == rule.ModeID &&
-                    p.PersonID == rule.PersonID &&
-                    p.NumberID == rule.NumberID &&
-                    p.GenderID == rule.GenderID)
-                    .ID;
-            }
-
-            var word = cols[0];
-            var existingWord = tmpWords.FirstOrDefault(p => p.Value.ToLower().Trim().Replace("’", "'") == word);
-            if (existingWord == null)
-            {
-                existingWord = new Word
-                {
-                    Value = word
-                };
-                tmpWords.Add(existingWord);
-                Db.Context.Words.Add(existingWord);
-                existingWord = tmpWords.FirstOrDefault(p => p.Value.ToLower().Trim() == word);
-            }
-
-            var colId = 1;
-            for (var i = 0; i < cbRules.Length; ++i)
-            {
-                if (cbRules[i].ModeID == 0) continue;
-                var existingRelation = tmpRelations.FirstOrDefault(p => p.RuleID == cbRules[i].ID && p.WordID == existingWord.ID);
-                if (existingRelation == null)
-                {
-                    var newRelation = new Relation
-                    {
-                        WordID = existingWord.ID,
-                        RuleID = cbRules[i].ID,
-                        Result = colId < cols.Count ? cols[colId] : empty
-                    };
-                    tmpRelations.Add(newRelation);
-                    Db.Context.Relations.Add(newRelation);
-                }
-                else
-                    existingRelation.Result = colId < cols.Count ? cols[colId] : empty;
-                ++colId;
-            }
+            db.SaveChanges();
         }
-        Db.Save();
     }
 }

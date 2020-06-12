@@ -17,42 +17,45 @@
         if (string.IsNullOrWhiteSpace(input)) return;
         var lines = input.Replace("’", "'").Split('\n').Select(p => p.Trim()).Where(p => !string.IsNullOrWhiteSpace(p));
 
-        var tmpWords = new List<Word>();
-        tmpWords.AddRange(Db.Context.Words);
-
-        foreach (var line in lines)
+        using (var db = new Db())
         {
-            var cols = line.Split('\t').Select(p => p.ToLower().Trim()).Select(p => string.IsNullOrWhiteSpace(p) ? "0" : p).ToList();
-            if (cols.Count == 0) continue;
-            while (cols.Count < 10) cols.Add("0");
-            var bitmaskArray = new bool[9];
-            for (var i = 1; i <= 9; ++i)
-            {
-                if (!int.TryParse(cols[i], out var bit)) bit = 0;
-                bitmaskArray[i - 1] = bit > 0;
-            }
+            var tmpWords = new List<Word>();
+            tmpWords.AddRange(db.Words);
 
-            var word = cols[0];
-            var translation = cols.Count > 10 ? cols[10] : null;
-            var bitmask = Helper.ArrayToBitmask(bitmaskArray);
-            var existing = tmpWords.FirstOrDefault(p => p.Value.ToLower().Replace("’", "'") == word);
-            if (existing == null)
+            foreach (var line in lines)
             {
-                var newWord = new Word
+                var cols = line.Split('\t').Select(p => p.ToLower().Trim()).Select(p => string.IsNullOrWhiteSpace(p) ? "0" : p).ToList();
+                if (cols.Count == 0) continue;
+                while (cols.Count < 10) cols.Add("0");
+                var bitmaskArray = new bool[9];
+                for (var i = 1; i <= 9; ++i)
                 {
-                    Value = word,
-                    Translation = translation,
-                    PrepositionsMask = bitmask
-                };
-                tmpWords.Add(newWord);
-                Db.Context.Words.Add(newWord);
+                    if (!int.TryParse(cols[i], out var bit)) bit = 0;
+                    bitmaskArray[i - 1] = bit > 0;
+                }
+
+                var word = cols[0];
+                var translation = cols.Count > 10 ? cols[10] : null;
+                var bitmask = Helper.ArrayToBitmask(bitmaskArray);
+                var existing = tmpWords.FirstOrDefault(p => p.Value.ToLower().Replace("’", "'") == word);
+                if (existing == null)
+                {
+                    var newWord = new Word
+                    {
+                        Value = word,
+                        Translation = translation,
+                        PrepositionsMask = bitmask
+                    };
+                    tmpWords.Add(newWord);
+                    db.Words.Add(newWord);
+                }
+                else
+                {
+                    existing.PrepositionsMask = bitmask;
+                    existing.Translation = existing.Translation == null ? translation : existing.Translation;
+                }
             }
-            else
-            {
-                existing.PrepositionsMask = bitmask;
-                existing.Translation = existing.Translation == null ? translation : existing.Translation;
-            }
+            db.Save();
         }
-        Db.Save();
     }
 }

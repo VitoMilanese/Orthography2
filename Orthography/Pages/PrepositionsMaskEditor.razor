@@ -113,7 +113,8 @@
     {
         base.OnInitialized();
 
-        Words = Db.Context.Words.OrderBy(p => p.Value.Replace("’", "'")).ToList();
+        using (var db = new Db())
+            Words = db.Words.OrderBy(p => p.Value.Replace("’", "'")).ToList();
     }
 
     private void Previous()
@@ -151,8 +152,11 @@
             if (i > 0) bitmask <<= 1;
         }
         var selected = Words[selectedWordListId];
-        var word = Db.Context.Words.FirstOrDefault(p => p.ID == selected.ID);
-        selected.PrepositionsMask = word.PrepositionsMask = bitmask;
-        Db.Save();
+        using (var db = new Db())
+        {
+            var word = db.Words.FirstOrDefault(p => p.ID == selected.ID);
+            selected.PrepositionsMask = word.PrepositionsMask = bitmask;
+            db.Save();
+        }
     }
 }
