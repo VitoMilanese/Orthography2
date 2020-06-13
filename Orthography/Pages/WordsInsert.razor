@@ -349,7 +349,7 @@
         Task.Run(async () =>
         {
             const string key = "ui_language";
-            var cookie = await Helper.ReadCookie(jsRuntime, key);
+            var cookie = Helper.ReadCookie(jsRuntime, key);
             var languageId = cookie?.FirstOrDefault(p => p.Key == key).Value;
             LanguageId = int.TryParse(languageId, out var id)
                             ? id
