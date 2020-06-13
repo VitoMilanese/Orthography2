@@ -31,7 +31,7 @@ namespace Orthography.Shared
 
 			using (var db = new Db())
 			{
-				foreach(var language in db.Languages.ToList())
+				foreach (var language in db.Languages.ToList())
 				{
 					ModeLabels.Add(language.ID, new Dictionary<int, string>());
 					NumberLabels.Add(language.ID, new Dictionary<int, string>());
