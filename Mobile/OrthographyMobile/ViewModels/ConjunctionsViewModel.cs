@@ -44,7 +44,16 @@ namespace OrthographyMobile.ViewModels
 		public bool RandomMode
 		{
 			get => m_randomMode;
-			set => SetProperty(ref m_randomMode, value);
+			set
+			{
+				if (m_randomMode != value)
+					Task.Run(() =>
+					{
+						lock (m_cacheLock)
+							Cache.Clear();
+					});
+				SetProperty(ref m_randomMode, value);
+			}
 		}
 
 		public EventHandler OnAnswerSubmit { get; set; }
