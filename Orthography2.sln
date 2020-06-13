@@ -125,6 +125,7 @@ Global
 		{DC70882A-3573-4D43-A54C-C5F93EC9C249}.Release|Any CPU.ActiveCfg = Release|iPhone
 		{DC70882A-3573-4D43-A54C-C5F93EC9C249}.Release|iPhone.ActiveCfg = Release|iPhone
 		{DC70882A-3573-4D43-A54C-C5F93EC9C249}.Release|iPhone.Build.0 = Release|iPhone
+		{DC70882A-3573-4D43-A54C-C5F93EC9C249}.Release|iPhone.Deploy.0 = Release|iPhone
 		{DC70882A-3573-4D43-A54C-C5F93EC9C249}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
 		{DC70882A-3573-4D43-A54C-C5F93EC9C249}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 	EndGlobalSection
