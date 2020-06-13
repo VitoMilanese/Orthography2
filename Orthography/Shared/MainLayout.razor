@@ -1,12 +1,14 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="sidebar">
-    <NavMenu />
+    <NavMenu LanguageChanged="OnLanguageChanged"/>
 </div>
 
 <div class="main" id="page-container">
     <div class="content px-4" id="content-wrap">
-        @Body
+        <CascadingValue Value=@LanguageId>
+            @Body
+        </CascadingValue>
     </div>
     <div class="modal-footer" id="footer">
         <div class="row mb-3" style="width:100%; font-size:14px">
@@ -46,4 +48,8 @@
         new KeyValuePair<string, string>("https://github.com/VitoMilanese/",
             "/images/github.png")
     };
+
+    private int LanguageId = UILanguage.DefaultLanguage;
+
+    private void OnLanguageChanged(int id) => LanguageId = id;
 }

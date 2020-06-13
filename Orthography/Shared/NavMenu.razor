@@ -1,4 +1,6 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@inject IJSRuntime jsRuntime
+
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">
         <div class="col-sm" style="margin-top: -5px">
             Orthography<br />
@@ -13,7 +15,7 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
         <li class="nav-item px-3 mb-2">
-            <label for="language" style="color:white">@UILabels.Labels["ui_language"]: </label>
+            <label for="language" style="color:white">@UILanguage.Label("ui_language", selectedLanguage): </label>
             <select id="language" class="form-control col-12" @bind="@selectedLanguage">
                 @foreach (var language in Languages)
                 {
@@ -25,12 +27,12 @@
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-book" aria-hidden="true"></span> @UILabels.Labels["ui_0_conjugation"]
+                <span class="oi oi-book" aria-hidden="true"></span> @UILanguage.Label("ui_0_conjugation", selectedLanguage)
             </NavLink>
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="prepositions">
-                <span class="oi oi-bolt" aria-hidden="true"></span> @UILabels.Labels["ui_0_prepositions"]
+                <span class="oi oi-bolt" aria-hidden="true"></span> @UILanguage.Label("ui_0_prepositions", selectedLanguage)
             </NavLink>
         </li>
     </ul>
@@ -39,38 +41,54 @@
 @code {
     private List<Language> Languages;
     private bool collapseNavMenu = true;
-    private int m_selectedLanguage;
+    private int m_selectedLanguage = UILanguage.DefaultLanguage;
     private int selectedLanguage
     {
         get => m_selectedLanguage;
         set
         {
             m_selectedLanguage = value;
-            UILabels.SelectLanguage(m_selectedLanguage);
+            if (isInitialized)
+            {
+                Helper.WriteCookie(jsRuntime, "ui_language", m_selectedLanguage.ToString(), 365);
+                LanguageChanged.InvokeAsync(m_selectedLanguage);
+            }
         }
     }
 
+    [Parameter] public EventCallback<int> LanguageChanged { get; set; }
+
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private bool isInitialized;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        isInitialized = false;
         using (var db = new Db())
         {
             Languages = db.Languages.ToList();
-            // alternative method
-            //var id_language_term = db.Terms.FirstOrDefault(p => p.Value == "ui_language")?.ID ?? -1;
             foreach (var language in Languages)
-            {
-                language.Label = db.Labels.FirstOrDefault(p => p.ID == language.LanguageNameID)?.Value ?? UILabels.UnknownLabel;
-                // alternative method
-                //language.Label = id_language_term == -1
-                //    ? UILabels.UnknownLabel
-                //    : db.Labels.FirstOrDefault(p => p.LanguageID == language.ID && p.TermID == id_language_term)?.Value ?? UILabels.UnknownLabel;
-            }
+                language.Label = db.Labels.FirstOrDefault(p => p.ID == language.LanguageNameID)?.Value ?? UILanguage.UnknownLabel(selectedLanguage);
+            Languages = Languages.OrderBy(p => p.Label).ToList();
         }
-        Languages = Languages.OrderBy(p => p.Label).ToList();
-        selectedLanguage = UILabels.CurrentLanguage.ID;
+        LoadLanguage();
+    }
+
+    public void LoadLanguage()
+    {
+        Task.Run(async () =>
+        {
+            const string key = "ui_language";
+            var cookie = await Helper.ReadCookie(jsRuntime, key);
+            var languageId = cookie?.FirstOrDefault(p => p.Key == key).Value;
+            selectedLanguage = int.TryParse(languageId, out var id)
+                            ? id
+                            : UILanguage.DefaultLanguage;
+            await InvokeAsync(StateHasChanged);
+            isInitialized = true;
+        }).ConfigureAwait(false);
     }
 
     private void ToggleNavMenu()

@@ -1,4 +1,5 @@
 ﻿@page "/insert"
+@inject IJSRuntime jsRuntime
 
 <table class="col-12">
     <tr>
@@ -8,7 +9,7 @@
                 @foreach (var mode in Modes)
                 {
                     <option value="@mode.ID">
-                        @UILabels.ModeLabels[@mode.ID]
+                        @UILanguage.Mode(@mode.ID, LanguageId)
                     </option>
                 }
             </select>
@@ -162,6 +163,8 @@
 </center>
 
 @code {
+    [CascadingParameter] int LanguageId { get; set; }
+
     private List<Mode> Modes;
     private int selectedMode;
     private bool allowEmpty;
@@ -209,6 +212,7 @@
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        LoadLanguage();
         using (var db = new Db())
         {
             Modes = db.Modes.ToList();
@@ -338,5 +342,19 @@
             }
             db.SaveChanges();
         }
+    }
+
+    public void LoadLanguage()
+    {
+        Task.Run(async () =>
+        {
+            const string key = "ui_language";
+            var cookie = await Helper.ReadCookie(jsRuntime, key);
+            var languageId = cookie?.FirstOrDefault(p => p.Key == key).Value;
+            LanguageId = int.TryParse(languageId, out var id)
+                            ? id
+                            : UILanguage.DefaultLanguage;
+            await InvokeAsync(StateHasChanged);
+        });
     }
 }

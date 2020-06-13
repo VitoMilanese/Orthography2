@@ -1,5 +1,6 @@
 ﻿@*https://mdbootstrap.com/docs/jquery/forms/checkbox/*@
 @page "/prepositions"
+@inject IJSRuntime jsRuntime
 
 @if (word == null)
 {
@@ -30,7 +31,7 @@ else
                                 }
                                 else
                                 {
-                                    @UILabels.Labels["ui_1_translation"]
+                                    @UILanguage.Label("ui_1_translation", LanguageId)
                                 }
                             </b>
                         </div>
@@ -102,7 +103,7 @@ else
                     }
                 </div>
                 <div class="col-6 col-sm-4" style="text-align:center">
-                    <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">@UILabels.Labels["ui_1_next"]</button>
+                    <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">@UILanguage.Label("ui_1_next", LanguageId)</button>
                 </div>
                 <div class="col-3 col-sm-4 mt-1" style="text-align:left; color:green">
                     @if (@countWrong > 0 || @countCorrect > 0)
@@ -115,13 +116,13 @@ else
             @if (resultValue)
             {
                 <div class="mb-5">
-                    <h3 class="mt-2" style="color:green">@UILabels.Labels["ui_1_correct"]</h3>
+                    <h3 class="mt-2" style="color:green">@UILanguage.Label("ui_1_correct", LanguageId)</h3>
                 </div>
             }
             else
             {
                 <div class="mb-5">
-                    <h3 class="mt-2" style="color:red">@UILabels.Labels["ui_1_errors"]</h3>
+                    <h3 class="mt-2" style="color:red">@UILanguage.Label("ui_1_errors", LanguageId)</h3>
                 </div>
             }
         </div>
@@ -137,7 +138,7 @@ else
                 }
             </div>
             <div class="col-6 col-sm-4 mb-5" style="text-align:center">
-                <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILabels.Labels["ui_1_check"]</button>
+                <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILanguage.Label("ui_1_check", LanguageId)</button>
             </div>
             <div class="col-3 col-sm-4 mt-1" style="text-align:left; color:green">
                 @if (@countWrong > 0 || @countCorrect > 0)
@@ -151,6 +152,8 @@ else
 }
 
 @code {
+    [CascadingParameter] int LanguageId { get; set; }
+
     private List<Word> Words;
     private Word word;
     private bool showResult;
@@ -173,13 +176,12 @@ else
         clear,
         clear,
         clear
-        };
+    };
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-
-        UILabels.OnLanguageChanged = UpdateUI;
+        LoadLanguage();
 
         using (var db = new Db())
         {
@@ -247,8 +249,17 @@ else
             cbStates[i] = false;
     }
 
-    private void UpdateUI(object sender, EventArgs e)
+    public void LoadLanguage()
     {
-        InvokeAsync(() => this.StateHasChanged());
+        Task.Run(async () =>
+        {
+            const string key = "ui_language";
+            var cookie = await Helper.ReadCookie(jsRuntime, key);
+            var languageId = cookie?.FirstOrDefault(p => p.Key == key).Value;
+            LanguageId = int.TryParse(languageId, out var id)
+                            ? id
+                            : UILanguage.DefaultLanguage;
+            await InvokeAsync(StateHasChanged);
+        });
     }
 }

@@ -12,12 +12,12 @@ else
         <div class="form-group col-sm mr-2">
             @if (Modes.Count > 0)
             {
-                <label for="mode">@UILabels.Labels["ui_0_mode"]: </label>
+                <label for="mode">@UILanguage.Label("ui_0_mode", LanguageId): </label>
                 <select id="mode" class="form-control col-12" disabled="@randomMode" @bind="@selectedMode">
                     @foreach (var mode in Modes)
                     {
                         <option value="@mode.ID" disabled="@mode.Disabled">
-                            @UILabels.ModeLabels[@mode.ID]
+                            @UILanguage.Mode(mode.ID, LanguageId)
                         </option>
                     }
                 </select>
@@ -25,7 +25,7 @@ else
                 {
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="cbRandomMode" @bind="@randomMode" />
-                        <label for="cbRandomMode" class="custom-control-label">@UILabels.Labels["ui_0_random"]</label>
+                        <label for="cbRandomMode" class="custom-control-label">@UILanguage.Label("ui_0_random", LanguageId)</label>
                     </div>
                 }
             }
@@ -33,12 +33,12 @@ else
         <div class="form-group col-sm mr-2">
             @if (Numbers.Count > 0)
             {
-                <label for="number">@UILabels.Labels["ui_0_number"]: </label>
+                <label for="number">@UILanguage.Label("ui_0_number", LanguageId): </label>
                 <select id="number" class="form-control" @bind="@selectedNumber">
                     @foreach (var number in Numbers)
                     {
                         <option value="@number.ID" disabled="@number.Disabled">
-                            @UILabels.NumberLabels[number.ID]
+                            @UILanguage.Number(number.ID, LanguageId)
                         </option>
                     }
                 </select>
@@ -47,12 +47,12 @@ else
         <div class="form-group col-sm mr-2">
             @if (Persons.Count > 0)
             {
-                <label for="person">@UILabels.Labels["ui_0_person"]: </label>
+                <label for="person">@UILanguage.Label("ui_0_person", LanguageId): </label>
                 <select id="person" class="form-control" @bind="@selectedPerson">
                     @foreach (var person in Persons)
                     {
                         <option value="@person.ID" disabled="@person.Disabled">
-                            @UILabels.PersonLabels[person.ID]
+                            @UILanguage.Person(person.ID, LanguageId)
                         </option>
                     }
                 </select>
@@ -61,12 +61,12 @@ else
         <div class="form-group col-sm">
             @if (Genders.Count > 0)
             {
-                <label for="gender">@UILabels.Labels["ui_0_gender"]: </label>
+                <label for="gender">@UILanguage.Label("ui_0_gender", LanguageId): </label>
                 <select id="gender" class="form-control" @bind="@selectedGender">
                     @foreach (var gender in Genders)
                     {
                         <option value="@gender.ID" disabled="@gender.Disabled">
-                            @UILabels.GenderLabels[gender.ID]
+                            @UILanguage.Gender(gender.ID, LanguageId)
                         </option>
                     }
                 </select>
@@ -107,7 +107,7 @@ else
                                             }
                                             else
                                             {
-                                                @UILabels.Labels["ui_0_translation"]
+                                                @UILanguage.Label("ui_0_translation", LanguageId)
                                             }
                                         </b>
                                     </div>
@@ -129,7 +129,7 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="Reset">@UILabels.Labels["ui_0_reset"]</button>
+                    <button type="button" class="btn btn-danger mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="Reset">@UILanguage.Label("ui_0_reset", LanguageId)</button>
                 }
             </div>
             <div class="col-6" style="text-align:center">
@@ -137,12 +137,12 @@ else
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="cbLockWord" @bind="lockWord" />
                         <label for="cbLockWord" class="custom-control-label" style="font-size: 14px">
-                            @UILabels.Labels["ui_0_lock_word"]
+                            @UILanguage.Label("ui_0_lock_word", LanguageId)
                         </label>
                     </div>
                 </div>
                 <div class="form-group col-12 mr-2 mt-0" hidden="@showResult">
-                    <input type="text" class="col-12" id="answer" placeholder="@UILabels.Labels["ui_0_answer"]"
+                    <input type="text" class="col-12" id="answer" placeholder="@UILanguage.Label("ui_0_answer", LanguageId)"
                            style="text-align:center;min-height:30pt"
                            @bind-value="@inputText" @bind-value:event="oninput"
                            @onkeypress="AnswerKeyPress" @ref="inputAnswer" />
@@ -152,11 +152,11 @@ else
                     <div class="form-group mt-2">
                         @if (resultValue)
                         {
-                            <h3 style="color:green; margin-bottom:14pt"><b>@UILabels.Labels["ui_0_correct"]</b></h3>
+                            <h3 style="color:green; margin-bottom:14pt"><b>@UILanguage.Label("ui_0_correct", LanguageId)</b></h3>
                         }
                         else
                         {
-                            <h3 style="color:red; margin-bottom:14pt"><b>@UILabels.Labels["ui_0_wrong"]</b></h3>
+                            <h3 style="color:red; margin-bottom:14pt"><b>@UILanguage.Label("ui_0_wrong", LanguageId)</b></h3>
                         }
                     </div>
                 }
@@ -168,7 +168,7 @@ else
                 }
                 else
                 {
-                    <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="CheckAnswer">@UILabels.Labels["ui_0_check"]</button>
+                    <button type="button" class="btn btn-info mt-4" style="min-height: 30pt; min-width: 80px; font-size:12px" @onclick="CheckAnswer">@UILanguage.Label("ui_0_check", LanguageId)</button>
                 }
             </div>
         </div>
@@ -191,7 +191,7 @@ else
                             }
                             else
                             {
-                                @UILabels.Labels["ui_0_answer"]
+                                @UILanguage.Label("ui_0_answer", LanguageId)
                             }
                         </b>
                     </a>
@@ -209,6 +209,8 @@ else
 }
 
 @code {
+    [CascadingParameter] int LanguageId { get; set; }
+
     private List<Word> Words;
     private List<Mode> Modes;
     private List<Number> Numbers;
@@ -299,6 +301,7 @@ else
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        LoadLanguage();
 
         using (var db = new Db())
         {
@@ -317,8 +320,6 @@ else
             var wordIds = Relations.Select(p => p.WordID).Distinct().ToList();
             Words = db.Words.Where(p => wordIds.Contains(p.ID)).ToList();
         }
-
-        UILabels.OnLanguageChanged = UpdateUI;
 
         GetWord();
         isInitialized = true;
@@ -345,8 +346,8 @@ else
             showResult = false;
             if (resultValue)
                 await GenerateWord();
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
         await jsRuntime.InvokeVoidAsync("SetFocusToElement", inputAnswer);
     }
 
@@ -366,8 +367,8 @@ else
             await Task.Delay(100);
             GetWord();
             isGenerating = false;
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
         await jsRuntime.InvokeVoidAsync("SetFocusToElement", inputAnswer);
     }
 
@@ -441,16 +442,16 @@ else
         const string DEFAULT_ANY = "any";
         var any = new[]
         {
-            (UILabels.Labels["ui_0_number_any"]?.ToLower() ?? DEFAULT_ANY),
-            (UILabels.Labels["ui_0_person_any"]?.ToLower() ?? DEFAULT_ANY),
-            (UILabels.Labels["ui_0_gender_any"]?.ToLower() ?? DEFAULT_ANY)
+            (UILanguage.Label("ui_0_number_any", LanguageId)?.ToLower() ?? DEFAULT_ANY),
+            (UILanguage.Label("ui_0_person_any", LanguageId)?.ToLower() ?? DEFAULT_ANY),
+            (UILanguage.Label("ui_0_gender_any", LanguageId)?.ToLower() ?? DEFAULT_ANY)
         };
         quickInfo = string.Join(" - ", new List<string>
 {
-            UILabels.ModeLabels[Modes.FirstOrDefault(p => p.ID == selectedMode).ID] ?? UILabels.UnknownLabel,
-            UILabels.NumberLabels[Numbers.FirstOrDefault(p => p.ID == selectedNumber).ID] ?? UILabels.UnknownLabel,
-            UILabels.PersonLabels[Persons.FirstOrDefault(p => p.ID == selectedPerson).ID] ?? UILabels.UnknownLabel,
-            UILabels.GenderLabels[Genders.FirstOrDefault(p => p.ID == selectedGender).ID] ?? UILabels.UnknownLabel
+            UILanguage.Mode(Modes.FirstOrDefault(p => p.ID == selectedMode).ID, LanguageId) ?? UILanguage.UnknownLabel(LanguageId),
+            UILanguage.Number(Numbers.FirstOrDefault(p => p.ID == selectedNumber).ID, LanguageId) ?? UILanguage.UnknownLabel(LanguageId),
+            UILanguage.Person(Persons.FirstOrDefault(p => p.ID == selectedPerson).ID, LanguageId) ?? UILanguage.UnknownLabel(LanguageId),
+            UILanguage.Gender(Genders.FirstOrDefault(p => p.ID == selectedGender).ID, LanguageId) ?? UILanguage.UnknownLabel(LanguageId)
         }.Where(p => !any.Contains(p.ToLower())));
     }
 
@@ -479,8 +480,8 @@ else
         {
             await Task.Delay(1000);
             showAnswer = false;
-        //this.StateHasChanged(); // necessary in Blazor WebAssembly
-    });
+            //this.StateHasChanged(); // necessary in Blazor WebAssembly
+        });
     }
 
     private void UpdateUI(object sender, EventArgs e)
@@ -492,5 +493,19 @@ else
     {
         showTranslation = !showTranslation;
         await jsRuntime.InvokeVoidAsync("SetFocusToElement", inputAnswer);
+    }
+
+    public void LoadLanguage()
+    {
+        Task.Run(async () =>
+        {
+            const string key = "ui_language";
+            var cookie = await Helper.ReadCookie(jsRuntime, key);
+            var languageId = cookie?.FirstOrDefault(p => p.Key == key).Value;
+            LanguageId = int.TryParse(languageId, out var id)
+                            ? id
+                            : UILanguage.DefaultLanguage;
+            await InvokeAsync(StateHasChanged);
+        });
     }
 }
