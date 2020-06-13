@@ -61,11 +61,11 @@
 						x:Name="btn_0"/>
 					<Button  Grid.Row="1" Grid.Column="0" TextColor="White"
 						BorderColor="White" BorderWidth="1"
-						HorizontalOptions="FillAndExpand" Text="à qqch"
+						HorizontalOptions="FillAndExpand" Text="de qqch"
 						x:Name="btn_1"/>
 					<Button  Grid.Row="2" Grid.Column="0" TextColor="White"
 						BorderColor="White" BorderWidth="1"
-						HorizontalOptions="FillAndExpand" Text="de qqch"
+						HorizontalOptions="FillAndExpand" Text="à qqch"
 						x:Name="btn_2"/>
 					
 					<Button  Grid.Row="0" Grid.Column="1" TextColor="White"
@@ -74,11 +74,11 @@
 						x:Name="btn_3"/>
 					<Button  Grid.Row="1" Grid.Column="1" TextColor="White"
 						BorderColor="White" BorderWidth="1"
-						HorizontalOptions="FillAndExpand" Text="à qqn"
+						HorizontalOptions="FillAndExpand" Text="de qqn"
 						x:Name="btn_4"/>
 					<Button  Grid.Row="2" Grid.Column="1" TextColor="White"
 						BorderColor="White" BorderWidth="1"
-						HorizontalOptions="FillAndExpand" Text="de qqn"
+						HorizontalOptions="FillAndExpand" Text="à qqn"
 						x:Name="btn_5"/>
 					
 					<Button  Grid.Row="0" Grid.Column="2" TextColor="White"
@@ -87,11 +87,11 @@
 						x:Name="btn_6"/>
 					<Button  Grid.Row="1" Grid.Column="2" TextColor="White"
 						BorderColor="White" BorderWidth="1"
-						HorizontalOptions="FillAndExpand" Text="à faire"
+						HorizontalOptions="FillAndExpand" Text="de faire"
 						x:Name="btn_7"/>
 					<Button  Grid.Row="2" Grid.Column="2" TextColor="White"
 						BorderColor="White" BorderWidth="1"
-						HorizontalOptions="FillAndExpand" Text="de faire"
+						HorizontalOptions="FillAndExpand" Text="à faire"
 						x:Name="btn_8"/>
 				</Grid>
 
