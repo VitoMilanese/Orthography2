@@ -13,7 +13,8 @@ namespace OrthographyMobile.ViewModels
 		public const int ShowAnswerTime = 1500;
 		public const int ShowResultTime = 750;
 		public const int DispatcherAwakeTime = 200;
-		public const int CacheSize = 30;
+		private const int CacheSize = 30;
+		private const int RefillCacheSpeed = 250;
 
 		private bool isCacheThreadRunning;
 		private Task cacheThread;
@@ -183,7 +184,7 @@ namespace OrthographyMobile.ViewModels
 				}
 
 				if (isCacheThreadRunning)
-					Task.Delay(1000).Wait();
+					Task.Delay(RefillCacheSpeed).Wait();
 			}
 			return Task.CompletedTask;
 		}
