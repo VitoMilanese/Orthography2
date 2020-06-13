@@ -73,18 +73,28 @@ namespace OrthographyMobile.ViewModels
 					BusyIndicator = true;
 					Task.Delay(DispatcherAwakeTime).Wait();
 
-					Word word;
+					Word word = null;
 
 					if (Cache.Count > 0)
 						lock (m_cacheLock)
 							word = Cache.Pop();
 					else
-					{
-						var exclId = Selected?.ID ?? 0;
-						word = Logic.GetRandomWordWithPreposition(exclId).Result;
-					}
+						try
+						{
+							var exclId = Selected?.ID ?? 0;
+							word = Logic.GetRandomWordWithPreposition(exclId).Result;
+						}
+						catch (Exception ex)
+						{
+							Debugger.Log(0, $"Debug_{GetType()}", ex.Message);
+						}
 
-					Selected = word;
+					if (word != null)
+						Selected = word;
+					else
+					{
+						// TODO: Manage missing connection
+					}
 				}
 				catch (Exception ex)
 				{
@@ -133,10 +143,17 @@ namespace OrthographyMobile.ViewModels
 					continue;
 				}
 
-				var word = Logic.GetRandomWordWithPreposition(Selected.ID).Result;
-				if (word != null)
-					lock (m_cacheLock)
-						Cache.Push(word);
+				try
+				{
+					var word = Logic.GetRandomWordWithPreposition(Selected.ID).Result;
+					if (word != null)
+						lock (m_cacheLock)
+							Cache.Push(word);
+				}
+				catch (Exception ex)
+				{
+					Debugger.Log(0, $"Debug_{GetType()}", ex.Message);
+				}
 
 				if (isCacheThreadRunning)
 					Task.Delay(1000).Wait();

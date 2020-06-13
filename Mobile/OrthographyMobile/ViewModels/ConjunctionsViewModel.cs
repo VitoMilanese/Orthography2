@@ -90,15 +90,27 @@ namespace OrthographyMobile.ViewModels
 						lock (m_cacheLock)
 							package = Cache.Pop();
 					else
-					{
-						var exclId = Selected.Relation != null ? Selected.Relation.ID : int.MinValue;
-						var exclMode = !RandomMode && Selected.Mode != null ? Selected.Mode.ID : int.MinValue;
-						package = Logic.GetRandomRelationDetailed(exclId, exclMode).Result;
-					}
+						try
+						{
+							var exclId = Selected.Relation != null ? Selected.Relation.ID : int.MinValue;
+							var exclMode = !RandomMode && Selected.Mode != null ? Selected.Mode.ID : int.MinValue;
+							package = Logic.GetRandomRelationDetailed(exclId, exclMode).Result;
+						}
+						catch (Exception ex)
+						{
+							Debugger.Log(0, $"Debug_{GetType()}", ex.Message);
+						}
 
-					Dispatcher.BeginInvokeOnMainThread(() => Selected.Package = package);
-					Task.Delay(DispatcherAwakeTime).Wait();
-					while (Selected.IsBusy) ;
+					if (package != null)
+					{
+						Dispatcher.BeginInvokeOnMainThread(() => Selected.Package = package);
+						Task.Delay(DispatcherAwakeTime).Wait();
+						while (Selected.IsBusy) ;
+					}
+					else
+					{
+						// TODO: Manage missing connection
+					}
 				}
 				catch (Exception ex)
 				{
@@ -149,10 +161,17 @@ namespace OrthographyMobile.ViewModels
 
 				var prevR = Selected.Relation.ID;
 				var prevM = !RandomMode ? Selected.Mode.ID : int.MinValue;
-				var random = Logic.GetRandomRelationDetailed(prevR, prevM).Result;
-				if (random != null)
-					lock (m_cacheLock)
-						Cache.Push(random);
+				try
+				{
+					var random = Logic.GetRandomRelationDetailed(prevR, prevM).Result;
+					if (random != null)
+						lock (m_cacheLock)
+							Cache.Push(random);
+				}
+				catch (Exception ex)
+				{
+					Debugger.Log(0, $"Debug_{GetType()}", ex.Message);
+				}
 
 				if (isCacheThreadRunning)
 					Task.Delay(1000).Wait();
