@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using OrthographyMobile.Models.dict;
@@ -8,6 +9,12 @@ namespace OrthographyMobile.ViewModels
 	public class PrepositionsViewModel : BaseViewModel
 	{
 		public const int DispatcherAwakeTime = 200;
+		public const int CacheSize = 30;
+
+		private bool isCacheThreadRunning;
+		private Task cacheThread;
+		private object m_cacheLock = new object();
+		private Stack<Word> Cache { get; set; }
 
 		public bool IsGenerating { get; private set; }
 
@@ -27,7 +34,7 @@ namespace OrthographyMobile.ViewModels
 
 		public PrepositionsViewModel()
 		{
-			if (IsBusy) return;
+			Cache = new Stack<Word>();
 			Selected = new Word();
 			GenerateWord();
 		}
@@ -66,8 +73,16 @@ namespace OrthographyMobile.ViewModels
 					BusyIndicator = true;
 					Task.Delay(DispatcherAwakeTime).Wait();
 
-					var exclId = Selected?.ID ?? 0;
-					var word = Logic.GetRandomWordWithPreposition(exclId).Result;
+					Word word;
+
+					if (Cache.Count > 0)
+						lock (m_cacheLock)
+							word = Cache.Pop();
+					else
+					{
+						var exclId = Selected?.ID ?? 0;
+						word = Logic.GetRandomWordWithPreposition(exclId).Result;
+					}
 
 					Selected = word;
 				}
@@ -82,6 +97,51 @@ namespace OrthographyMobile.ViewModels
 					IsGenerating = false;
 				}
 			});
+		}
+
+		public void RunRefillCacheThread()
+		{
+			if (cacheThread != null)
+			{
+				isCacheThreadRunning = false;
+				cacheThread?.Wait();
+			}
+			isCacheThreadRunning = true;
+			cacheThread = new Task(() => RefillCacheThread());
+			cacheThread.ConfigureAwait(false);
+			cacheThread.Start();
+		}
+
+		public void StopRefillCacheThread()
+		{
+			isCacheThreadRunning = false;
+		}
+
+		private Task RefillCacheThread()
+		{
+			while (isCacheThreadRunning)
+			{
+				if (Selected == null)
+				{
+					Task.Delay(500).Wait();
+					continue;
+				}
+
+				if (Cache.Count >= CacheSize)
+				{
+					Task.Delay(1000).Wait();
+					continue;
+				}
+
+				var word = Logic.GetRandomWordWithPreposition(Selected.ID).Result;
+				if (word != null)
+					lock (m_cacheLock)
+						Cache.Push(word);
+
+				if (isCacheThreadRunning)
+					Task.Delay(1000).Wait();
+			}
+			return Task.CompletedTask;
 		}
 	}
 }

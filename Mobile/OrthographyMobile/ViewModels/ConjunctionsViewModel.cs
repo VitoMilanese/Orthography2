@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using OrthographyMobile.ViewModels.Helpers;
+using OrthographyMobile.Models;
+using System.Collections.Generic;
 
 namespace OrthographyMobile.ViewModels
 {
@@ -11,6 +13,12 @@ namespace OrthographyMobile.ViewModels
 		public const int ShowAnswerTime = 1500;
 		public const int ShowResultTime = 750;
 		public const int DispatcherAwakeTime = 200;
+		public const int CacheSize = 30;
+
+		private bool isCacheThreadRunning;
+		private Task cacheThread;
+		private object m_cacheLock = new object();
+		private Stack<GeneratedPackage> Cache { get; set; }
 
 		private IDispatcher Dispatcher { get; }
 
@@ -46,6 +54,7 @@ namespace OrthographyMobile.ViewModels
 		public ConjunctionsViewModel(IDispatcher dispatcher)
 		{
 			Dispatcher = dispatcher;
+			Cache = new Stack<GeneratedPackage>();
 			Selected = new GeneratedPackageToken();
 			if (Device.RuntimePlatform == Device.iOS)
 				UI = new ConjunctionsPageBindings_iOS();
@@ -75,12 +84,19 @@ namespace OrthographyMobile.ViewModels
 					BusyIndicator = true;
 					Task.Delay(DispatcherAwakeTime).Wait();
 
-					var exclId = Selected.Relation != null ? Selected.Relation.ID : int.MinValue;
-					var exclMode = !RandomMode && Selected.Mode != null ? Selected.Mode.ID : int.MinValue;
+					GeneratedPackage package = null;
 
-					var random = Logic.GetRandomRelationDetailed(exclId, exclMode).Result;
+					if (Cache.Count > 0)
+						lock (m_cacheLock)
+							package = Cache.Pop();
+					else
+					{
+						var exclId = Selected.Relation != null ? Selected.Relation.ID : int.MinValue;
+						var exclMode = !RandomMode && Selected.Mode != null ? Selected.Mode.ID : int.MinValue;
+						package = Logic.GetRandomRelationDetailed(exclId, exclMode).Result;
+					}
 
-					Dispatcher.BeginInvokeOnMainThread(() => Selected.Package = random);
+					Dispatcher.BeginInvokeOnMainThread(() => Selected.Package = package);
 					Task.Delay(DispatcherAwakeTime).Wait();
 					while (Selected.IsBusy) ;
 				}
@@ -95,6 +111,53 @@ namespace OrthographyMobile.ViewModels
 					IsGenerating = false;
 				}
 			});
+		}
+
+		public void RunRefillCacheThread()
+		{
+			if (cacheThread != null)
+			{
+				isCacheThreadRunning = false;
+				cacheThread?.Wait();
+			}
+			isCacheThreadRunning = true;
+			cacheThread = new Task(() => RefillCacheThread());
+			cacheThread.ConfigureAwait(false);
+			cacheThread.Start();
+		}
+
+		public void StopRefillCacheThread()
+		{
+			isCacheThreadRunning = false;
+		}
+
+		private Task RefillCacheThread()
+		{
+			while (isCacheThreadRunning)
+			{
+				if (Selected.Relation == null || Selected.Mode == null)
+				{
+					Task.Delay(500).Wait();
+					continue;
+				}
+
+				if (Cache.Count >= CacheSize)
+				{
+					Task.Delay(1000).Wait();
+					continue;
+				}
+
+				var prevR = Selected.Relation.ID;
+				var prevM = !RandomMode ? Selected.Mode.ID : int.MinValue;
+				var random = Logic.GetRandomRelationDetailed(prevR, prevM).Result;
+				if (random != null)
+					lock (m_cacheLock)
+						Cache.Push(random);
+
+				if (isCacheThreadRunning)
+					Task.Delay(1000).Wait();
+			}
+			return Task.CompletedTask;
 		}
 	}
 }

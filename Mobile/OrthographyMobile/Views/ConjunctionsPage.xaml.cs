@@ -25,6 +25,18 @@ namespace OrthographyMobile.Views
 			viewModel.OnAnswerSubmit = Check_Clicked;
 		}
 
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+			viewModel.RunRefillCacheThread();
+		}
+
+		protected override void OnDisappearing()
+		{
+			viewModel.StopRefillCacheThread();
+			base.OnDisappearing();
+		}
+
 		private byte orientation = 0;
 		protected override void OnSizeAllocated(double width, double height)
 		{

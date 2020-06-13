@@ -39,14 +39,17 @@ namespace OrthographyMobile.Views
 			isEditing = true;
 		}
 
-		//protected override void OnApplyTemplate()
-		//{
-		//	base.OnApplyTemplate();
-		//	var mdPage = Application.Current.MainPage as MasterDetailPage;
-		//	var navPage = mdPage.Detail as NavigationPage;
-		//	navPage.BarBackgroundColor = Color.Red;
-		//	//NavigationPage.BarBackgroundColorProperty
-		//}
+		protected override void OnAppearing()
+		{
+			base.OnAppearing();
+			viewModel.RunRefillCacheThread();
+		}
+
+		protected override void OnDisappearing()
+		{
+			viewModel.StopRefillCacheThread();
+			base.OnDisappearing();
+		}
 
 		void Translate_Clicked(Object sender, EventArgs e)
 		{
