@@ -209,7 +209,17 @@ else
 }
 
 @code {
-    [CascadingParameter] int LanguageId { get; set; }
+    private int m_languageId; //UpdateQuickInfo()
+    //[CascadingParameter] int LanguageId { get; set; }
+    [CascadingParameter] int LanguageId
+    {
+        get => m_languageId;
+        set
+        {
+            m_languageId = value;
+            UpdateQuickInfo();
+        }
+    }
 
     private List<Word> Words;
     private List<Mode> Modes;
@@ -438,7 +448,12 @@ else
             p.RuleID == selectedRule.ID &&
             p.WordID == selectedWord.ID);
         answer = selectedRelation?.Result.Replace("’", "'") ?? null;
+        UpdateQuickInfo();
+    }
 
+    private void UpdateQuickInfo()
+    {
+        if (!isInitialized) return;
         const string DEFAULT_ANY = "any";
         var any = new[]
         {
@@ -447,7 +462,7 @@ else
             (UILanguage.Label("ui_0_gender_any", LanguageId)?.ToLower() ?? DEFAULT_ANY)
         };
         quickInfo = string.Join(" - ", new List<string>
-{
+        {
             UILanguage.Mode(Modes.FirstOrDefault(p => p.ID == selectedMode).ID, LanguageId) ?? UILanguage.UnknownLabel(LanguageId),
             UILanguage.Number(Numbers.FirstOrDefault(p => p.ID == selectedNumber).ID, LanguageId) ?? UILanguage.UnknownLabel(LanguageId),
             UILanguage.Person(Persons.FirstOrDefault(p => p.ID == selectedPerson).ID, LanguageId) ?? UILanguage.UnknownLabel(LanguageId),
