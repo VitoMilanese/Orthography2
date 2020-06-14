@@ -2,28 +2,41 @@
 @page "/prepositions"
 @inject IJSRuntime jsRuntime
 
-@if (word == null)
-{
-    <NoWordsFound />
-}
-else
-{
-    <div class="container mt-0 mt-sm-5">
-        <div class="row">
-            <div class="col-sm" />
-            <div class="col-sm" style="text-align:center; min-width: 60%">
+<table style="width:100%; height:25px; margin: 20px 0px 15px 0px">
+    <tr>
+        <td style="width: 30%; text-align:center">
+            <button type="button" class="btn btn-danger"
+                    style="min-height: 30pt; min-width: 100px; margin:0px; padding:0px"
+                    @onclick="Restart">
+                @UILanguage.Label("ui_0_reset", LanguageId)
+            </button>
+        </td>
+        <td style="width: 40%; text-align:center">
+            <input type="text" id="answer" placeholder="First Letter"
+                   style="text-align:center;min-height:30pt; width:100%"
+                   @bind-value="@letters" @bind-value:event="oninput" />
+        </td>
+        <td style="width: 30%; text-align:center">
+            <button type="button" class="btn btn-info"
+                    style="min-height: 30pt; min-width: 100px; margin:0px; padding:0px"
+                    @onclick="ApplyFilter">
+                Apply
+            </button>
+        </td>
+    </tr>
+</table>
+
+<div class="container m-0">
+    <div class="row">
+        <div class="col-sm" />
+        <div class="col-sm" style="text-align:center; min-width: 60%">
+            @if (word != null)
+            {
                 <h1><b>@word.Value</b></h1>
                 @if (!string.IsNullOrWhiteSpace(@word.Translation))
                 {
-                    <a type="button" class="LinkButton" @onclick="() => showTranslation = !showTranslation"
-                       style="-webkit-appearance:none; -moz-appearance:none; appearance:none">
-                        <div class="LinkButton" style="border: 1px solid orange; border-radius: 5px;
-                            -webkit-touch-callout: none;
-                            -webkit-user-select: none;
-                            -khtml-user-select: none;
-                            -moz-user-select: none;
-                            -ms-user-select: none;
-                            user-select: none">
+                    <a type="button" class="LinkButton" @onclick="() => showTranslation = !showTranslation" style="@btnStyle">
+                        <div class="LinkButton" style="@btnDivStyle">
                             <b>
                                 @if (showTranslation)
                                 {
@@ -37,38 +50,45 @@ else
                         </div>
                     </a>
                 }
-            </div>
-            <div class="col-sm" />
+            }
         </div>
+        <div class="col-sm" />
     </div>
+</div>
+@if (word == null)
+{
+    <NoWordsFound />
+}
+else
+{
     <table class="mt-3" align="center">
         <tr>
             <td>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[0]">
-                    <input type="checkbox" class="custom-control-input" id="cb0" @bind="@cbStates[0]">
-                    <label for="cb0" class="custom-control-label">qqch</label>
+                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[0].Checked">
+                    <label for="cb1" class="custom-control-label">qqch</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[1]">
-                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[1]">
+                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[1].Checked">
                     <label for="cb1" class="custom-control-label">de qqch</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[2]">
-                    <input type="checkbox" class="custom-control-input" id="cb2" @bind="@cbStates[2]">
+                    <input type="checkbox" class="custom-control-input" id="cb2" @bind="@cbStates[2].Checked">
                     <label for="cb2" class="custom-control-label">à qqch</label>
                 </div>
             </td>
             <td width="15px" />
             <td>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[3]">
-                    <input type="checkbox" class="custom-control-input" id="cb3" @bind="@cbStates[3]">
+                    <input type="checkbox" class="custom-control-input" id="cb3" @bind="@cbStates[3].Checked">
                     <label for="cb3" class="custom-control-label">qqn</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[4]">
-                    <input type="checkbox" class="custom-control-input" id="cb4" @bind="@cbStates[4]">
+                    <input type="checkbox" class="custom-control-input" id="cb4" @bind="@cbStates[4].Checked">
                     <label for="cb4" class="custom-control-label">de qqn</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[5]">
-                    <input type="checkbox" class="custom-control-input" id="cb5" @bind="@cbStates[5]">
+                    <input type="checkbox" class="custom-control-input" id="cb5" @bind="@cbStates[5].Checked">
                     <label for="cb5" class="custom-control-label">à qqn</label>
                 </div>
             </td>
@@ -76,15 +96,15 @@ else
             <td>
                 <div class="col-sm">
                     <div class="custom-control custom-checkbox m-2" style="color:@colors[6]">
-                        <input type="checkbox" class="custom-control-input" id="cb6" @bind="@cbStates[6]">
+                        <input type="checkbox" class="custom-control-input" id="cb6" @bind="@cbStates[6].Checked">
                         <label for="cb6" class="custom-control-label">faire</label>
                     </div>
                     <div class="custom-control custom-checkbox m-2" style="color:@colors[7]">
-                        <input type="checkbox" class="custom-control-input" id="cb7" @bind="@cbStates[7]">
+                        <input type="checkbox" class="custom-control-input" id="cb7" @bind="@cbStates[7].Checked">
                         <label for="cb7" class="custom-control-label">de faire</label>
                     </div>
                     <div class="custom-control custom-checkbox m-2" style="color:@colors[8]">
-                        <input type="checkbox" class="custom-control-input" id="cb8" @bind="@cbStates[8]">
+                        <input type="checkbox" class="custom-control-input" id="cb8" @bind="@cbStates[8].Checked">
                         <label for="cb8" class="custom-control-label">à faire</label>
                     </div>
                 </div>
@@ -138,7 +158,10 @@ else
                 }
             </div>
             <div class="col-6 col-sm-4 mb-5" style="text-align:center">
-                <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILanguage.Label("ui_1_check", LanguageId)</button>
+                @if (@anySelected)
+                {
+                    <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILanguage.Label("ui_1_check", LanguageId)</button>
+                }
             </div>
             <div class="col-3 col-sm-4 mt-1" style="text-align:left; color:green">
                 @if (@countWrong > 0 || @countCorrect > 0)
@@ -164,24 +187,39 @@ else
     private const string clear = "black";
     private const string correct = "green";
     private const string wrong = "red";
-    private bool[] cbStates = new bool[9];
-    private string[] colors = new string[]
+    private const string btnStyle = "-webkit-appearance:none; -moz-appearance:none; appearance:none";
+    private const string btnDivStyle = "border: 1px solid orange; border-radius: 5px; - webkit - touch - callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none";
+    private string[] colors;
+    private CheckBox[] cbStates;
+    private bool anySelected;
+    private bool isLoadingFilter = true;
+
+    private string m_letters;
+    private string letters
     {
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear
-    };
+        get => m_letters;
+        set
+        {
+            m_letters = value;
+            SaveFilter();
+        }
+    }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         LoadLanguage();
+        LoadFilter();
+
+        colors = new string[9];
+        cbStates = new CheckBox[9];
+        for (var i = 0; i < cbStates.Length; ++i)
+        {
+            colors[i] = clear;
+            cbStates[i] = new CheckBox();
+            var id = i;
+            cbStates[i].OnChanged = (o, e) => UpdateCheckBoxes(id, e);
+        }
 
         using (var db = new Db())
         {
@@ -204,33 +242,76 @@ else
         }
         else
         {
-            var id = rnd.Next(Words.Count - (word == null ? 0 : 1));
-            word = Words.Where(p => word == null || p.ID != word.ID).ToList()[id];
+            var words = (letters?.Length ?? 0) < 1
+                ? Words
+                : Words.Where(p =>
+                    (p.Value.ToLower().IndexOf("se ") != 0
+                        && p.Value.ToLower().Replace("’", "'").IndexOf("s'") != 0
+                        && letters.ToLower().Contains(p.Value.ToLower()[0]))
+                    || (p.Value.ToLower().Replace("’", "'").IndexOf("s'") == 0
+                        && letters.ToLower().Contains(p.Value.ToLower()[2]))
+                    || (p.Value.ToLower().IndexOf("se ") == 0
+                        && letters.ToLower().Contains(p.Value.ToLower()[3])));
+            var diff = 0;
+            if (word != null && word.Value.Length > 0)
+                if ((letters?.Length ?? 0) < 1)
+                    diff = 1;
+                else
+                    diff = letters.ToLower().Contains(word.Value.ToLower()[0]) ? 1 : 0;
+            var count = words.Count();
+            if (count > 0)
+            {
+                var id = rnd.Next(count - diff);
+                words = words.Where(p => word == null || p.ID != word.ID);
+                word = words.Skip(id).FirstOrDefault();
+            }
+            else
+                word = null;
+            if (word == null)
+            {
+            }
         }
     }
 
     private void CheckAnswer()
     {
-        var rnd = new Random(DateTime.Now.Millisecond);
-        for (var i = 0; i < colors.Length; ++i)
-        {
-            var color = rnd.Next(4);
-            colors[i] = color == 0 ? clear : color == 1 ? correct : wrong;
-        }
-
         resultValue = true;
         var bits = Helper.BitmaskToArray((int)word.PrepositionsMask, 9);
+        var ok = 0;
+        var not_ok = 0;
         for (var i = 0; i < cbStates.Length; ++i)
         {
-            var f = cbStates[i] == bits[i];
+            cbStates[i].Enabled = false;
+            if (bits[i])
+            {
+                if (cbStates[i].Checked)
+                    ++ok;
+                else
+                    ++not_ok;
+            }
+            else if (cbStates[i].Checked)
+                ++not_ok;
+            var f = cbStates[i].Checked == bits[i];
             resultValue &= f;
             colors[i] = f ? correct : wrong;
         }
-        if (resultValue)
-            ++countCorrect;
-        else
-            ++countWrong;
+        countCorrect += ok;
+        countWrong += not_ok;
         showResult = true;
+    }
+
+    private void ApplyFilter()
+    {
+        if (word == null
+            || string.IsNullOrWhiteSpace(letters)
+            || (word.Value.ToLower().IndexOf("se ") != 0
+                && word.Value.ToLower().Replace("’", "'").IndexOf("s'") != 0
+                && !letters.ToLower().Contains(word.Value.ToLower()[0]))
+            || (word.Value.ToLower().Replace("’", "'").IndexOf("s'") == 0
+                && !letters.ToLower().Contains(word.Value.ToLower()[2]))
+            || (word.Value.ToLower().IndexOf("se ") == 0
+                && !letters.ToLower().Contains(word.Value.ToLower()[3])))
+            GenerateWord();
     }
 
     private void GenerateWord()
@@ -241,12 +322,27 @@ else
         resultValue = false;
     }
 
+    private void Restart()
+    {
+        countCorrect = 0;
+        countWrong = 0;
+        GenerateWord();
+    }
+
     private void Reset()
     {
         for (var i = 0; i < colors.Length; ++i)
             colors[i] = "black";
         for (var i = 0; i < cbStates.Length; ++i)
-            cbStates[i] = false;
+        {
+            cbStates[i].Enabled = true;
+            cbStates[i].Checked = false;
+        }
+    }
+
+    private void UpdateCheckBoxes(int cbId, bool value)
+    {
+        anySelected = cbStates.Any(p => p.Checked);
     }
 
     private void LoadLanguage()
@@ -261,5 +357,25 @@ else
                             : UILanguage.DefaultLanguage;
             await InvokeAsync(StateHasChanged);
         });
+    }
+
+    private void LoadFilter()
+    {
+        Task.Run(async () =>
+        {
+            const string key = "prepositions_filter";
+            var cookie = Helper.ReadCookie(jsRuntime, key);
+            isLoadingFilter = true;
+            letters = cookie?.Value;
+            isLoadingFilter = false;
+            Restart();
+            await InvokeAsync(StateHasChanged);
+        }).ConfigureAwait(false);
+    }
+
+    private void SaveFilter()
+    {
+        if (isLoadingFilter) return;
+        Helper.WriteCookie(jsRuntime, "prepositions_filter", letters, 365);
     }
 }
