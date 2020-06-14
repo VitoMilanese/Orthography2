@@ -188,7 +188,7 @@ else
         clear,
         clear,
         clear
-            };
+                            };
 
     protected override void OnInitialized()
     {
@@ -250,16 +250,25 @@ else
     {
         resultValue = true;
         var bits = Helper.BitmaskToArray((int)word.PrepositionsMask, 9);
+        var ok = 0;
+        var not_ok = 0;
         for (var i = 0; i < cbStates.Length; ++i)
         {
+            if (bits[i])
+            {
+                if (cbStates[i])
+                    ++ok;
+                else
+                    ++not_ok;
+            }
+            else if (cbStates[i])
+                ++not_ok;
             var f = cbStates[i] == bits[i];
             resultValue &= f;
             colors[i] = f ? correct : wrong;
         }
-        if (resultValue)
-            ++countCorrect;
-        else
-            ++countWrong;
+        countCorrect += ok;
+        countWrong += not_ok;
         showResult = true;
     }
 
