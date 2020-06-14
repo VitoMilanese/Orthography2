@@ -46,6 +46,9 @@
 @if (word == null)
 {
     <NoWordsFound />
+    <div class="col-6 col-sm-4" style="text-align:center">
+        <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">@UILanguage.Label("ui_1_reset", LanguageId)</button>
+    </div>
 }
 else
 {
@@ -185,7 +188,7 @@ else
         clear,
         clear,
         clear
-        };
+            };
 
     protected override void OnInitialized()
     {
@@ -237,18 +240,14 @@ else
             }
             else
                 word = null;
+            if (word == null)
+            {
+            }
         }
     }
 
     private void CheckAnswer()
     {
-        var rnd = new Random(DateTime.Now.Millisecond);
-        for (var i = 0; i < colors.Length; ++i)
-        {
-            var color = rnd.Next(4);
-            colors[i] = color == 0 ? clear : color == 1 ? correct : wrong;
-        }
-
         resultValue = true;
         var bits = Helper.BitmaskToArray((int)word.PrepositionsMask, 9);
         for (var i = 0; i < cbStates.Length; ++i)
