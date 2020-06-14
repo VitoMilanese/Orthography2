@@ -2,31 +2,34 @@
 @page "/prepositions/alph"
 @inject IJSRuntime jsRuntime
 
-<div class="container mt-0 mt-sm-5">
+<table style="width:100%; height:25px; margin: 20px 0px 15px 0px">
+    <tr>
+        <td style="width: 30%; text-align:center">
+            <button type="button" class="btn btn-danger"
+                    style="min-height: 30pt; min-width: 100px; margin:0px; padding:0px"
+                    @onclick="Restart">
+                @UILanguage.Label("ui_0_reset", LanguageId)
+            </button>
+        </td>
+        <td style="width: 40%; text-align:center">
+            <input type="text" id="answer" placeholder="First Letter"
+                   style="text-align:center;min-height:30pt; width:100%"
+                   @bind-value="@letters" @bind-value:event="oninput" />
+        </td>
+        <td style="width: 30%; text-align:center">
+            <button type="button" class="btn btn-info"
+                    style="min-height: 30pt; min-width: 100px; margin:0px; padding:0px"
+                    @onclick="ApplyFilter">
+                Apply
+            </button>
+        </td>
+    </tr>
+</table>
+
+<div class="container m-0">
     <div class="row">
         <div class="col-sm" />
         <div class="col-sm" style="text-align:center; min-width: 60%">
-            <div class="row mr-2 mb-3">
-                <div class="col-3" />
-                <div class="col-6">
-                    <input type="text" id="answer" placeholder="First Letter"
-                           style="text-align:center;min-height:30pt"
-                           @bind-value="@letter" @bind-value:event="oninput" />
-                </div>
-                <div class="col-3" style="text-align:center">
-                    @if (word == null)
-                    {
-                        <button type="button" class="btn btn-danger" style="min-height: 30pt; min-width: 100px" @onclick="GenerateWord">@UILanguage.Label("ui_0_reset", LanguageId)</button>
-                    }
-                    else
-                    {
-                        @if (@countWrong > 0 || @countCorrect > 0)
-                        {
-                            <button type="button" class="btn btn-danger" style="min-height: 30pt; min-width: 100px" @onclick="Restart">Restrat</button>
-                        }
-                    }
-                </div>
-            </div>
             @if (word != null)
             {
                 <h1><b>@word.Value</b></h1>
@@ -181,7 +184,6 @@ else
     private bool showTranslation;
     private int countWrong;
     private int countCorrect;
-    private string letter;
     private const string clear = "black";
     private const string correct = "green";
     private const string wrong = "red";
@@ -190,11 +192,24 @@ else
     private string[] colors;
     private CheckBox[] cbStates;
     private bool anySelected;
+    private bool isLoadingFilter = true;
+
+    private string m_letters;
+    private string letters
+    {
+        get => m_letters;
+        set
+        {
+            m_letters = value;
+            SaveFilter();
+        }
+    }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         LoadLanguage();
+        LoadFilter();
 
         colors = new string[9];
         cbStates = new CheckBox[9];
@@ -227,21 +242,22 @@ else
         }
         else
         {
-            var words = (letter?.Length ?? 0) < 1
+            var words = (letters?.Length ?? 0) < 1
                 ? Words
-                : Words
-                    .Where(p => letter.ToLower().Contains(p.Value.ToLower()[0])
-                        || (p.Value.Length > 2 && p.Value.ToLower().Replace("’", "'").IndexOf("s'") == 0
-                            && letter.ToLower().Contains(p.Value.ToLower()[2]))
-                        || (p.Value.Length > 3 && p.Value.ToLower().IndexOf("se ") == 0
-                            && letter.ToLower().Contains(p.Value.ToLower()[3]))
-                    );
+                : Words.Where(p =>
+                    (p.Value.ToLower().IndexOf("se ") != 0
+                        && p.Value.ToLower().Replace("’", "'").IndexOf("s'") != 0
+                        && letters.ToLower().Contains(p.Value.ToLower()[0]))
+                    || (p.Value.ToLower().Replace("’", "'").IndexOf("s'") == 0
+                        && letters.ToLower().Contains(p.Value.ToLower()[2]))
+                    || (p.Value.ToLower().IndexOf("se ") == 0
+                        && letters.ToLower().Contains(p.Value.ToLower()[3])));
             var diff = 0;
             if (word != null && word.Value.Length > 0)
-                if ((letter?.Length ?? 0) < 1)
+                if ((letters?.Length ?? 0) < 1)
                     diff = 1;
                 else
-                    diff = letter.ToLower().Contains(word.Value.ToLower()[0]) ? 1 : 0;
+                    diff = letters.ToLower().Contains(word.Value.ToLower()[0]) ? 1 : 0;
             var count = words.Count();
             if (count > 0)
             {
@@ -284,6 +300,20 @@ else
         showResult = true;
     }
 
+    private void ApplyFilter()
+    {
+        if (word == null
+            || string.IsNullOrWhiteSpace(letters)
+            || (word.Value.ToLower().IndexOf("se ") != 0
+                && word.Value.ToLower().Replace("’", "'").IndexOf("s'") != 0
+                && !letters.ToLower().Contains(word.Value.ToLower()[0]))
+            || (word.Value.ToLower().Replace("’", "'").IndexOf("s'") == 0
+                && !letters.ToLower().Contains(word.Value.ToLower()[2]))
+            || (word.Value.ToLower().IndexOf("se ") == 0
+                && !letters.ToLower().Contains(word.Value.ToLower()[3])))
+            GenerateWord();
+    }
+
     private void GenerateWord()
     {
         showResult = false;
@@ -315,17 +345,37 @@ else
         anySelected = cbStates.Any(p => p.Checked);
     }
 
-    public void LoadLanguage()
+    private void LoadLanguage()
     {
         Task.Run(async () =>
         {
             const string key = "ui_language";
             var cookie = Helper.ReadCookie(jsRuntime, key);
-            var languageId = cookie?.FirstOrDefault(p => p.Key == key).Value;
+            var languageId = cookie?.Value;
             LanguageId = int.TryParse(languageId, out var id)
                             ? id
                             : UILanguage.DefaultLanguage;
             await InvokeAsync(StateHasChanged);
         });
+    }
+
+    private void LoadFilter()
+    {
+        Task.Run(async () =>
+        {
+            const string key = "prepositions_filter";
+            var cookie = Helper.ReadCookie(jsRuntime, key);
+            isLoadingFilter = true;
+            letters = cookie?.Value;
+            isLoadingFilter = false;
+            Restart();
+            await InvokeAsync(StateHasChanged);
+        }).ConfigureAwait(false);
+    }
+
+    private void SaveFilter()
+    {
+        if (isLoadingFilter) return;
+        Helper.WriteCookie(jsRuntime, "prepositions_filter", letters, 365);
     }
 }

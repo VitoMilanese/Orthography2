@@ -82,7 +82,7 @@
         {
             const string key = "ui_language";
             var cookie = Helper.ReadCookie(jsRuntime, key);
-            var languageId = cookie?.FirstOrDefault(p => p.Key == key).Value;
+            var languageId = cookie?.Value;
             selectedLanguage = int.TryParse(languageId, out var id)
                             ? id
                             : UILanguage.DefaultLanguage;

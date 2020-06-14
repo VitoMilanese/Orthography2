@@ -39,16 +39,17 @@ namespace Orthography.Shared
             jsRuntime.InvokeAsync<string>("WriteCookie", name, value, days);
         }
 
-		public static IEnumerable<KeyValuePair<string, string>> ReadCookie(IJSRuntime jsRuntime, string name)
+		public static KeyValuePair<string, string>? ReadCookie(IJSRuntime jsRuntime, string name)
 		{
-			var response = jsRuntime.InvokeAsync<string>("ReadCookie", name).Result;
+			var response = jsRuntime.InvokeAsync<string>("ReadCookie").Result;
 			if (!string.IsNullOrWhiteSpace(response))
 			{
 				var cookies = response
 					.Split(";")
 					.Select(p => p.Split("="))
-					.Where(p => p.Length > 1)
-					.Select(p => new KeyValuePair<string, string>(p[0], p[1]));
+					.Where(p => p.Length > 1 && p[0].Trim() == name)
+					.Select(p => new KeyValuePair<string, string>(p[0], p[1]))
+                    .FirstOrDefault();
 				return cookies;
 			}
 			return null;

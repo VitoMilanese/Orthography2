@@ -12,7 +12,6 @@ function WriteCookie(name, value, days) {
     document.cookie = name + "=" + value + expires + "; path=/";
 }
 
-function ReadCookie(name) {
-
+function ReadCookie() {
     return document.cookie
 }
