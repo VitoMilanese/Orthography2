@@ -2,33 +2,29 @@
 @page "/prepositions/alph"
 @inject IJSRuntime jsRuntime
 
-@if (word == null)
-{
-    <NoWordsFound />
-}
-else
-{
-    <div class="container mt-0 mt-sm-5">
-        <div class="row">
-            <div class="col-sm" />
-            <div class="col-sm" style="text-align:center; min-width: 60%">
-                <div class="form-group col-12 mr-2 mb-3">
-                    <input type="text" class="col-2" id="answer" placeholder="Letter"
-                           style="text-align:center;min-height:30pt" maxlength="1"
-                           @bind-value="@letter" @bind-value:event="oninput" />
-                </div>
+<div class="container mt-0 mt-sm-5">
+    <div class="row">
+        <div class="col-sm" />
+        <div class="col-sm" style="text-align:center; min-width: 60%">
+            <div class="form-group col-12 mr-2 mb-3">
+                <input type="text" class="col-6" id="answer" placeholder="First Letter"
+                       style="text-align:center;min-height:30pt"
+                       @bind-value="@letter" @bind-value:event="oninput" />
+            </div>
+            @if (word != null)
+            {
                 <h1><b>@word.Value</b></h1>
                 @if (!string.IsNullOrWhiteSpace(@word.Translation))
                 {
                     <a type="button" class="LinkButton" @onclick="() => showTranslation = !showTranslation"
                        style="-webkit-appearance:none; -moz-appearance:none; appearance:none">
                         <div class="LinkButton" style="border: 1px solid orange; border-radius: 5px;
-                            -webkit-touch-callout: none;
-                            -webkit-user-select: none;
-                            -khtml-user-select: none;
-                            -moz-user-select: none;
-                            -ms-user-select: none;
-                            user-select: none">
+                                -webkit-touch-callout: none;
+                                -webkit-user-select: none;
+                                -khtml-user-select: none;
+                                -moz-user-select: none;
+                                -ms-user-select: none;
+                                user-select: none">
                             <b>
                                 @if (showTranslation)
                                 {
@@ -42,10 +38,17 @@ else
                         </div>
                     </a>
                 }
-            </div>
-            <div class="col-sm" />
+            }
         </div>
+        <div class="col-sm" />
     </div>
+</div>
+@if (word == null)
+{
+    <NoWordsFound />
+}
+else
+{
     <table class="mt-3" align="center">
         <tr>
             <td>
@@ -166,7 +169,7 @@ else
     private bool showTranslation;
     private int countWrong;
     private int countCorrect;
-    private string letter = "A";
+    private string letter;
     private const string clear = "black";
     private const string correct = "green";
     private const string wrong = "red";
@@ -182,7 +185,7 @@ else
         clear,
         clear,
         clear
-    };
+        };
 
     protected override void OnInitialized()
     {
@@ -210,15 +213,30 @@ else
         }
         else
         {
-            var words = letter.Length < 1 ? Words : Words.Where(p => p.Value.ToLower()[0] == letter.ToLower()[0]).ToList();
+            var words = (letter?.Length ?? 0) < 1
+                ? Words
+                : Words
+                    .Where(p => letter.ToLower().Contains(p.Value.ToLower()[0])
+                        || (p.Value.Length > 2 && p.Value.ToLower().Replace("’", "'").IndexOf("s'") == 0
+                            && letter.ToLower().Contains(p.Value.ToLower()[2]))
+                        || (p.Value.Length > 3 && p.Value.ToLower().IndexOf("se ") == 0
+                            && letter.ToLower().Contains(p.Value.ToLower()[3]))
+                    );
             var diff = 0;
             if (word != null && word.Value.Length > 0)
                 if (letter.Length < 1)
                     diff = 1;
                 else
-                    diff = word.Value.ToLower()[0] == letter.ToLower()[0] ? 1 : 0;
-            var id = rnd.Next(words.Count - diff);
-            word = words.Where(p => word == null || p.ID != word.ID).ToList()[id];
+                    diff = letter.ToLower().Contains(word.Value.ToLower()[0]) ? 1 : 0;
+            var count = words.Count();
+            if (count > 0)
+            {
+                var id = rnd.Next(count - diff);
+                words = words.Where(p => word == null || p.ID != word.ID);
+                word = words.Skip(id).FirstOrDefault();
+            }
+            else
+                word = null;
         }
     }
 
