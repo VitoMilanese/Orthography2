@@ -32,15 +32,8 @@
                 <h1><b>@word.Value</b></h1>
                 @if (!string.IsNullOrWhiteSpace(@word.Translation))
                 {
-                    <a type="button" class="LinkButton" @onclick="() => showTranslation = !showTranslation"
-                       style="-webkit-appearance:none; -moz-appearance:none; appearance:none">
-                        <div class="LinkButton" style="border: 1px solid orange; border-radius: 5px;
-                                -webkit-touch-callout: none;
-                                -webkit-user-select: none;
-                                -khtml-user-select: none;
-                                -moz-user-select: none;
-                                -ms-user-select: none;
-                                user-select: none">
+                    <a type="button" class="LinkButton" @onclick="() => showTranslation = !showTranslation" style="@btnStyle">
+                        <div class="LinkButton" style="@btnDivStyle">
                             <b>
                                 @if (showTranslation)
                                 {
@@ -69,30 +62,30 @@ else
         <tr>
             <td>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[0]">
-                    <input type="checkbox" class="custom-control-input" id="cb0" @bind="@cbStates[0]">
-                    <label for="cb0" class="custom-control-label">qqch</label>
+                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[0].Checked">
+                    <label for="cb1" class="custom-control-label">qqch</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[1]">
-                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[1]">
+                    <input type="checkbox" class="custom-control-input" id="cb1" @bind="@cbStates[1].Checked">
                     <label for="cb1" class="custom-control-label">de qqch</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[2]">
-                    <input type="checkbox" class="custom-control-input" id="cb2" @bind="@cbStates[2]">
+                    <input type="checkbox" class="custom-control-input" id="cb2" @bind="@cbStates[2].Checked">
                     <label for="cb2" class="custom-control-label">à qqch</label>
                 </div>
             </td>
             <td width="15px" />
             <td>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[3]">
-                    <input type="checkbox" class="custom-control-input" id="cb3" @bind="@cbStates[3]">
+                    <input type="checkbox" class="custom-control-input" id="cb3" @bind="@cbStates[3].Checked">
                     <label for="cb3" class="custom-control-label">qqn</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[4]">
-                    <input type="checkbox" class="custom-control-input" id="cb4" @bind="@cbStates[4]">
+                    <input type="checkbox" class="custom-control-input" id="cb4" @bind="@cbStates[4].Checked">
                     <label for="cb4" class="custom-control-label">de qqn</label>
                 </div>
                 <div class="custom-control custom-checkbox m-2" style="color:@colors[5]">
-                    <input type="checkbox" class="custom-control-input" id="cb5" @bind="@cbStates[5]">
+                    <input type="checkbox" class="custom-control-input" id="cb5" @bind="@cbStates[5].Checked">
                     <label for="cb5" class="custom-control-label">à qqn</label>
                 </div>
             </td>
@@ -100,15 +93,15 @@ else
             <td>
                 <div class="col-sm">
                     <div class="custom-control custom-checkbox m-2" style="color:@colors[6]">
-                        <input type="checkbox" class="custom-control-input" id="cb6" @bind="@cbStates[6]">
+                        <input type="checkbox" class="custom-control-input" id="cb6" @bind="@cbStates[6].Checked">
                         <label for="cb6" class="custom-control-label">faire</label>
                     </div>
                     <div class="custom-control custom-checkbox m-2" style="color:@colors[7]">
-                        <input type="checkbox" class="custom-control-input" id="cb7" @bind="@cbStates[7]">
+                        <input type="checkbox" class="custom-control-input" id="cb7" @bind="@cbStates[7].Checked">
                         <label for="cb7" class="custom-control-label">de faire</label>
                     </div>
                     <div class="custom-control custom-checkbox m-2" style="color:@colors[8]">
-                        <input type="checkbox" class="custom-control-input" id="cb8" @bind="@cbStates[8]">
+                        <input type="checkbox" class="custom-control-input" id="cb8" @bind="@cbStates[8].Checked">
                         <label for="cb8" class="custom-control-label">à faire</label>
                     </div>
                 </div>
@@ -162,7 +155,10 @@ else
                 }
             </div>
             <div class="col-6 col-sm-4 mb-5" style="text-align:center">
-                <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILanguage.Label("ui_1_check", LanguageId)</button>
+                @if (@anySelected)
+                {
+                    <button type="button" class="btn btn-info" style="min-height: 30pt; min-width: 100px" @onclick="CheckAnswer">@UILanguage.Label("ui_1_check", LanguageId)</button>
+                }
             </div>
             <div class="col-3 col-sm-4 mt-1" style="text-align:left; color:green">
                 @if (@countWrong > 0 || @countCorrect > 0)
@@ -189,24 +185,26 @@ else
     private const string clear = "black";
     private const string correct = "green";
     private const string wrong = "red";
-    private bool[] cbStates = new bool[9];
-    private string[] colors = new string[]
-    {
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear,
-        clear
-                            };
+    private const string btnStyle = "-webkit-appearance:none; -moz-appearance:none; appearance:none";
+    private const string btnDivStyle = "border: 1px solid orange; border-radius: 5px; - webkit - touch - callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none";
+    private string[] colors;
+    private CheckBox[] cbStates;
+    private bool anySelected;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         LoadLanguage();
+
+        colors = new string[9];
+        cbStates = new CheckBox[9];
+        for (var i = 0; i < cbStates.Length; ++i)
+        {
+            colors[i] = clear;
+            cbStates[i] = new CheckBox();
+            var id = i;
+            cbStates[i].OnChanged = (o, e) => UpdateCheckBoxes(id, e);
+        }
 
         using (var db = new Db())
         {
@@ -267,16 +265,17 @@ else
         var not_ok = 0;
         for (var i = 0; i < cbStates.Length; ++i)
         {
+            cbStates[i].Enabled = false;
             if (bits[i])
             {
-                if (cbStates[i])
+                if (cbStates[i].Checked)
                     ++ok;
                 else
                     ++not_ok;
             }
-            else if (cbStates[i])
+            else if (cbStates[i].Checked)
                 ++not_ok;
-            var f = cbStates[i] == bits[i];
+            var f = cbStates[i].Checked == bits[i];
             resultValue &= f;
             colors[i] = f ? correct : wrong;
         }
@@ -305,7 +304,15 @@ else
         for (var i = 0; i < colors.Length; ++i)
             colors[i] = "black";
         for (var i = 0; i < cbStates.Length; ++i)
-            cbStates[i] = false;
+        {
+            cbStates[i].Enabled = true;
+            cbStates[i].Checked = false;
+        }
+    }
+
+    private void UpdateCheckBoxes(int cbId, bool value)
+    {
+        anySelected = cbStates.Any(p => p.Checked);
     }
 
     public void LoadLanguage()
