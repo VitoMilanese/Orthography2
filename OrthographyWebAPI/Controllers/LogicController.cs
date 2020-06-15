@@ -1,5 +1,6 @@
 ﻿using DataLayer;
 using DataLayer.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using OAPI.Web.Models;
@@ -9,6 +10,7 @@ using System.Linq;
 
 namespace OAPI.Controllers.dict
 {
+	[EnableCors("AllowAnyOriginPolicy")]
 	[ApiController]
 	[Route("[controller]")]
 	public class LogicController : ControllerBase

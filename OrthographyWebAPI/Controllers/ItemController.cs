@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OAPI.Models;
 
 namespace OAPI.Controllers
 {
+	[EnableCors("AllowAnyOriginPolicy")]
 	[Route("item")]
 	[ApiController]
 	public class ItemController : ControllerBase

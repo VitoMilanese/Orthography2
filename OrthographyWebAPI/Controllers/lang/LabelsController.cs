@@ -2,11 +2,13 @@
 using System.Linq;
 using DataLayer;
 using DataLayer.Models;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace OAPI.Controllers.dict
 {
+	[EnableCors("AllowAnyOriginPolicy")]
 	[ApiController]
 	[Route("lang/[controller]")]
 	public class LabelsController : ControllerBase
